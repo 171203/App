@@ -269,7 +269,7 @@ if st.button("Portfolio Optimization"):
         tickers.append(i)
 
     mean_returns = dataset[['AMAZON','MICROSOFT','FDX','Netflix']].pct_change().mean()
-    cov = dataset[['AMAZON','MICROSOFT','FDX','Netflix']].pct_change().cov()
+    cov = data[['AMAZON','MICROSOFT','FDX','Netflix']].pct_change().cov()
     num_portfolios = 10000
     rf = 0.025
     results_frame =simulate_random_portfolios(num_portfolios, mean_returns,cov, rf)
