@@ -3,6 +3,11 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import yfinance as yf
+def log_returns(prices):
+    return np.log(prices / prices.shift(1))
+
+def arithmetic_returns(prices):
+    return prices/prices.shift(1) - 1
 
 st.title("Portfolio Optimization using Markowitz Model")
 
@@ -63,6 +68,7 @@ if st.button("Optimize"):
     st.subheader("Portfolio Composition")
     st.write("Optimal Weights:")
     st.write(weights)
+    log_return = log_returns(prices=data).dropna()
     num_ports = 5000
     all_weights = np.zeros((num_ports, len(data.columns)))
     ret_arr = np.zeros(num_ports)
