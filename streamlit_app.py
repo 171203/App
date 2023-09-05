@@ -51,7 +51,6 @@ if uploaded_file is not None:
         # Portfolio Optimization
         st.header("Portfolio Optimization")
 
-log_return = np.log(data / data.shift(1))
 
 # Main content
 if st.button("Daily Returns of the Portfolio"):
