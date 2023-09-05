@@ -131,18 +131,18 @@ if st.button("Train the Model"):
         # Sharpe Ratio
         sharpe_arr[ind] = ret_arr[ind]/vol_arr[ind]
 
-        max_sr_ret = ret_arr[4632]
-        max_sr_vol = vol_arr[4632]
-        # plot the dataplt.figure(figsize=(12,8))
-        plt.scatter(vol_arr,ret_arr,c=sharpe_arr,cmap='plasma')
-        plt.colorbar(label='Sharpe Ratio')
-        plt.title("Visualization of the Portfolio")
-        plt.xlabel('Volatility')
-        plt.ylabel('Return')
+    max_sr_ret = ret_arr[4632]
+    max_sr_vol = vol_arr[4632]
+    # plot the dataplt.figure(figsize=(12,8))
+    plt.scatter(vol_arr,ret_arr,c=sharpe_arr,cmap='plasma')
+    plt.colorbar(label='Sharpe Ratio')
+    plt.title("Visualization of the Portfolio")
+    plt.xlabel('Volatility')
+    plt.ylabel('Return')
 
-        # add a red dot for max_sr_vol & max_sr_ret
-        plt.scatter(max_sr_vol, max_sr_ret, c='red', s=50, edgecolors='black')
-        st.pyplot(plt)
+    # add a red dot for max_sr_vol & max_sr_ret
+    plt.scatter(max_sr_vol, max_sr_ret, c='red', s=50, edgecolors='black')
+    st.pyplot(plt)
 
     # Minimum Variance Portfolio Optimization
 if st.button("Minimum Variance Optimization"):
