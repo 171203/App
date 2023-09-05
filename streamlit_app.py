@@ -59,16 +59,33 @@ if st.button("Optimize"):
     Markowitz_sr = Markowitz_exp_ret / Markowitz_exp_vol
     print(f'\nSharpe ratio of the portfolio: {Markowitz_sr[0][0]}')
 
-    
-
     # Display portfolio composition
     st.subheader("Portfolio Composition")
     st.write("Optimal Weights:")
     st.write(weights)
+    num_ports = 5000
+    all_weights = np.zeros((num_ports, len(dataset.columns)))
+    ret_arr = np.zeros(num_ports)
+    vol_arr = np.zeros(num_ports)
+    sharpe_arr = np.zeros(num_ports)
 
-    # Plot portfolio composition
-    plt.pie(weights, labels=symbols, autopct='%1.1f%%', startangle=140)
-    st.pyplot(plt)
+    for ind in range(num_ports):
+        weights = np.array(np.random.random(4))
+        weights = weights/np.sum(weights)
+
+        # save the weights
+        all_weights[ind,:] = weights
+
+        # expected return
+        ret_arr[ind] = np.sum((log_return.mean()*weights)*252)
+
+        # expected volatility
+        vol_arr[ind] = np.sqrt(np.dot(weights.T,np.dot(log_return.cov()*252, weights)))
+
+        # Sharpe Ratio
+        sharpe_arr[ind] = ret_arr[ind]/vol_arr[ind]
+
+   
 
 
 
