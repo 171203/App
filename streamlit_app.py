@@ -3,27 +3,20 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import yfinance as yf
-
+@st.cache
+def load_data():
+    dataset = pd.read_csv(csv_url)
+    return data
 st.title("Portfolio Optimization using Markowitz Model")
 # Main content
 if st.button("Optimize"):
     st.write("Optimizing...")
     st.title("Display CSV File in Streamlit App")
 
-# Add the URL of your CSV file on GitHub
-csv_url = "https://github.com/171203/App/blob/main/dataset.csv"
-
-# Load the CSV file into a DataFrame
-@st.cache
-def load_data():
-    dataset = pd.read_csv(csv_url)
-    return data
-
-dataset = load_data()
-
-# Display the loaded data
-st.write("Displaying CSV Data:")
-st.dataframe(dataset)
+    csv_url = "https://github.com/171203/App/blob/main/dataset.csv"
+    dataset = load_data()
+    st.write("Displaying CSV Data:")
+    st.dataframe(dataset)
     # Calculate portfolio statistics
     expected_returns = dataset.pct_change().mean() * 252
     cov_matrix = dataset.pct_change().cov() * 252
