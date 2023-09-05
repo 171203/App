@@ -150,7 +150,7 @@ if st.button("Minimum Variance Optimization"):
     mv_return = log_return.T.values
     bounds = tuple((0, 1) for x in range(len(mv_return)))
     equally_weighted_portfolio = np.array([1 / len(mv_return) for x in range(len(mv_return))])
-    opts = minimizer.minimize(expected_sharpe, x0=equally_weighted_portfolio, args=mv_return, method="SLSQP", bounds=bounds, constraints=cons)
+    opts = minimizer.minimize(expected_sharpe(), x0=equally_weighted_portfolio, args=mv_return, method="SLSQP", bounds=bounds, constraints=cons)
     return_target = portfolio_return(equally_weighted_portfolio, mv_return)
     cons = ({'type': 'eq',
          'fun': lambda x: np.sum(np.mean(mv_return, axis=1) * x) * 252 - return_target
@@ -162,7 +162,7 @@ if st.button("Minimum Variance Optimization"):
          })  
     bounds = tuple((0, 1) for x in range(len(mv_return)))
     equally_weighted_portfolio = np.array([1 / len(mv_return) for x in range(len(mv_return))])
-    opts = minimizer.minimize(taget_fun, x0=equally_weighted_portfolio, args=mv_return, method="SLSQP", bounds=bounds, constraints=cons)
+    opts = minimizer.minimize(taget_fun(), x0=equally_weighted_portfolio, args=mv_return, method="SLSQP", bounds=bounds, constraints=cons)
     min_var_portfolio = opts['x'].round(3)
     st.write('**Minimum variance Optimization:**')
     st.write('**Expected Return:**',portfolio_return(min_var_portfolio, mv_return))
