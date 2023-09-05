@@ -17,7 +17,7 @@ uploaded_file = st.file_uploader("Upload a CSV file", type=["csv"])
 # Define the expected column names
 expected_columns = ["AMAZON", "MICROSOFT", "FDX", "Netflix"]
 
-if uploaded_file is not None:
+if uploaded_file is None:
     # Load the CSV file into a DataFrame
     data = pd.read_csv(uploaded_file)
 
