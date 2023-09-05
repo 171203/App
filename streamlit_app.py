@@ -9,7 +9,7 @@ def log_returns(prices):
 def arithmetic_returns(prices):
     return prices/prices.shift(1) - 1
 
-st.title('<span style="color: blue;">"Portfolio Optimization using Markowitz Model")
+st.title('<span style="color: blue;">Portfolio Optimization using Markowitz Model</span>')
 
 # Upload a CSV file from your local computer
 uploaded_file = st.file_uploader("Upload a CSV file", type=["csv"])
