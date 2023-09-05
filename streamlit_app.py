@@ -118,6 +118,18 @@ if st.button("Optimize"):
     plt.xlabel('Volatility')
     plt.ylabel('Return')
     st.pyplot(plt)
+    max_sr_ret = ret_arr[4632]
+    max_sr_vol = vol_arr[4632]
+    # plot the dataplt.figure(figsize=(12,8))
+    plt.scatter(vol_arr,ret_arr,c=sharpe_arr,cmap='plasma')
+    plt.colorbar(label='Sharpe Ratio')
+    plt.title("Marking up Maximum Sharp Ratio with Red Color")
+    plt.xlabel('Volatility')
+    plt.ylabel('Return')
+
+    # add a red dot for max_sr_vol & max_sr_ret
+    plt.scatter(max_sr_vol, max_sr_ret, c='red', s=50, edgecolors='black')
+    st.pyplot(plt)
 
    
 
