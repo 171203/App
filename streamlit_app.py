@@ -15,6 +15,13 @@ def load_data():
 
 data = load_data()
 
+# Sidebar
+st.sidebar.header("Portfolio Inputs")
+st.sidebar.write("Enter the details of your portfolio:")
+
+# Risk-Free Rate Input
+st.sidebar.subheader("Risk-Free Rate (%)")
+risk_free_rate = st.sidebar.number_input("Enter risk-free rate (%)", 0.0, 10.0, 2.0)
 
 # Main content
 if st.button("Optimize"):
@@ -55,6 +62,7 @@ if st.button("Optimize"):
     # Plot portfolio composition
     plt.pie(weights, labels=symbols, autopct='%1.1f%%', startangle=140)
     st.pyplot(plt)
+
 
 
 
