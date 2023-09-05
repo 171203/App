@@ -205,42 +205,42 @@ def efficient_frontier(return_range):
 if st.button('Simulation'):
     # Portfolio Simulation
     portfolio        = 2673  # generation of a portfolio
-   n_assets         = log_return.shape[1]
-   weights          = np.random.dirichlet(np.full(n_assets,0.05),portfolio)
-   mean_returns     = log_return.mean()
-   sigma            = log_return.cov()
-   expected_returns = np.zeros(portfolio)
-   expected_vol     = np.zeros(portfolio)
-   sharpe_ratio     = np.zeros(portfolio)
-   rf_rate          = 0.0                          # risk free rate
+    n_assets         = log_return.shape[1]
+    weights          = np.random.dirichlet(np.full(n_assets,0.05),portfolio)
+    mean_returns     = log_return.mean()
+    sigma            = log_return.cov()
+    expected_returns = np.zeros(portfolio)
+    expected_vol     = np.zeros(portfolio)
+    sharpe_ratio     = np.zeros(portfolio)
+    rf_rate          = 0.0                          # risk free rate
 
-   for i in range(portfolio):
-       w  = weights[i,:]
-       expected_returns[i] = np.sum(mean_returns @ w)*252
-       expected_vol[i]  = np.sqrt(np.dot(w.T,sigma @ w))*np.sqrt(252)
-       sharpe_ratio[i] = (expected_returns[i]-rf_rate)/expected_vol[i]
+    for i in range(portfolio):
+        w  = weights[i,:]
+        expected_returns[i] = np.sum(mean_returns @ w)*252
+        expected_vol[i]  = np.sqrt(np.dot(w.T,sigma @ w))*np.sqrt(252)
+        sharpe_ratio[i] = (expected_returns[i]-rf_rate)/expected_vol[i]
 
-sharpe_maximum      = max_sharpe_ratio()
-return_p,vol_p      = portfolio_performance(sharpe_maximum['x'])
-min_volatility      = min_vol()
-return_min,vol_min  = portfolio_performance(min_volatility['x'])
-plt.figure(figsize =(15,10))
-plt.style.use('ggplot')
-plt.scatter(expected_vol,expected_returns, c = sharpe_ratio)
-# plt.colorbar.sel(label = 'Sharpe Ratio',size=20)
-plt.colorbar().set_label('Sharpe Ratio', size= 20, color = 'g', family='serif',weight='bold')
-target               = np.linspace(return_min,1.02,100)
-efficient_portfolios = efficient_frontier(target)
-plt.plot([i.fun for i in efficient_portfolios], target, linestyle ='dashdot', color ='black', label='Efficient Frontier')
-plt.scatter(vol_p,return_p, c = 'r', marker='*', s = 500, label = 'Maximum Sharpe Ratio')
-plt.scatter(vol_min,return_min, c = 'g',  marker ='*', s = 500, label='Minimum Volatility Portfolio')
-font1 = {'family':'serif','color':'darkred','size':20,'weight':'bold'}
-font2 = {'family':'serif','color':'darkred','size':20,'weight':'bold'}
-plt.title('Portfolio Optimization based on Efficient Frontier',fontdict=font1)
-plt.xlabel('Annualised Volatility',fontdict=font2)
-plt.ylabel('Annualised Returns',fontdict=font2)
-plt.legend(labelspacing=0.8)
-st.pyplot(plt)
+    sharpe_maximum      = max_sharpe_ratio()
+    return_p,vol_p      = portfolio_performance(sharpe_maximum['x'])
+    min_volatility      = min_vol()
+    return_min,vol_min  = portfolio_performance(min_volatility['x'])
+    plt.figure(figsize =(15,10))
+    plt.style.use('ggplot')
+    plt.scatter(expected_vol,expected_returns, c = sharpe_ratio)
+    # plt.colorbar.sel(label = 'Sharpe Ratio',size=20)
+    plt.colorbar().set_label('Sharpe Ratio', size= 20, color = 'g', family='serif',weight='bold')
+    target               = np.linspace(return_min,1.02,100)
+    efficient_portfolios = efficient_frontier(target)
+    plt.plot([i.fun for i in efficient_portfolios], target, linestyle ='dashdot', color ='black', label='Efficient Frontier')
+    plt.scatter(vol_p,return_p, c = 'r', marker='*', s = 500, label = 'Maximum Sharpe Ratio')
+    plt.scatter(vol_min,return_min, c = 'g',  marker ='*', s = 500, label='Minimum Volatility Portfolio')
+    font1 = {'family':'serif','color':'darkred','size':20,'weight':'bold'}
+    font2 = {'family':'serif','color':'darkred','size':20,'weight':'bold'}
+    plt.title('Portfolio Optimization based on Efficient Frontier',fontdict=font1)
+    plt.xlabel('Annualised Volatility',fontdict=font2)
+    plt.ylabel('Annualised Returns',fontdict=font2)
+    plt.legend(labelspacing=0.8)
+    st.pyplot(plt)
 
 
     
