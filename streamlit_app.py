@@ -6,18 +6,27 @@ import yfinance as yf
 
 st.title("Portfolio Optimization using Markowitz Model")
 
-st.title("CSV File Viewer")
+# Upload a CSV file from your local computer
+uploaded_file = st.file_uploader("Upload a CSV file", type=["csv"])
 
-# Upload the CSV file
-uploaded_file = st.file_uploader("Choose a CSV file", type=["csv"])
+# Define the expected column names
+expected_columns = ["AMAZON", "MICROSOFT", "FDX", "Netflix"]
 
 if uploaded_file is not None:
-    # Read the CSV file into a DataFrame
+    # Load the CSV file into a DataFrame
     data = pd.read_csv(uploaded_file)
 
-    # Display the data in the DataFrame
-    st.write("CSV Data:")
-    st.dataframe(data)
+    # Check if the DataFrame contains the expected columns
+    if not set(expected_columns).issubset(data.columns):
+        st.error("Warning: The given dataset is not suitable for the Optimization:)
+        st.error("Error: Please upload the Portfolio Dataset.")
+    else:
+        # Display the uploaded data
+        st.write("Uploaded CSV Data:")
+        st.dataframe(data)
+
+        # Portfolio Optimization
+        st.header("Portfolio Optimization")
 
 # Main content
 if st.button("Optimize"):
