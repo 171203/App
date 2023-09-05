@@ -265,10 +265,10 @@ def simulate_random_portfolios(num_portfolios, mean_returns, cov, rf): # random 
 
 if st.button("Portfolio Optimization"):
     tickers = []
-    for i in dataset[['AMAZON','MICROSOFT','FDX','Netflix']].columns:
+    for i in data[['AMAZON','MICROSOFT','FDX','Netflix']].columns:
         tickers.append(i)
 
-    mean_returns = dataset[['AMAZON','MICROSOFT','FDX','Netflix']].pct_change().mean()
+    mean_returns = data[['AMAZON','MICROSOFT','FDX','Netflix']].pct_change().mean()
     cov = data[['AMAZON','MICROSOFT','FDX','Netflix']].pct_change().cov()
     num_portfolios = 10000
     rf = 0.025
