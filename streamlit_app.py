@@ -9,7 +9,7 @@ st.title("Portfolio Optimization using Markowitz Model")
 # Load the CSV file from GitHub
 @st.cache
 def load_data():
-    url = "https://github.com/171203/App/blob/main/dataset.csv"
+    url = "https://github.com/171203/App/blob/main/data.csv"
     data = pd.read_csv(url)
     return data
 
