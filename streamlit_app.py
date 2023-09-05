@@ -9,7 +9,7 @@ def log_returns(prices):
 def arithmetic_returns(prices):
     return prices/prices.shift(1) - 1
 
-st.title('<span style="color: blue;">Portfolio Optimization using Markowitz Model</span>')
+st.title("Portfolio Optimization using Markowitz Model")
 
 # Upload a CSV file from your local computer
 uploaded_file = st.file_uploader("Upload a CSV file", type=["csv"])
@@ -34,6 +34,11 @@ if uploaded_file is not None:
         st.header("Portfolio Optimization")
 
 # Main content
+if st.button("Box Plots"):
+    plt.style.use("fivethirtyeight")
+    data[['AMAZON','MICROSOFT','FDX', 'Netflix']].boxplot()
+    plt.title("Boxplot of Stock Prices (Amazon, Microsoft, FDX, Netflix,)")
+    st.pyplot(plt)
 if st.button("Optimize"):
     st.write("Optimizing...")
     # Calculate expected returns and covariance matrix
