@@ -105,7 +105,8 @@ if st.button("Implementing the Optimization Algorithm"):
     # Sharpe ratio
     Markowitz_sr = Markowitz_exp_ret / Markowitz_exp_vol
     st.write(f'\nSharpe ratio of the portfolio: **{Markowitz_sr[0][0]}**')
-    log_return = log_returns(prices=data).dropna()
+
+log_return = log_returns(prices=data).dropna()
     
 if st.button("Train the Model"):
     num_ports = 5000
