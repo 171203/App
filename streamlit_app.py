@@ -13,15 +13,7 @@ def download_stock_data():
 
     return AMZN['Adj Close'], MSFT['Adj Close'], NFLX['Adj Close'], FDX['Adj Close']
 
-st.title("Portfolio Optimization using Markowitz Model")
-
-# Sidebar
-st.sidebar.header("Portfolio Inputs")
-st.sidebar.write("Enter the details of your portfolio:")
-
-# Risk-Free Rate Input
-st.sidebar.subheader("Risk-Free Rate (%)")
-risk_free_rate = st.sidebar.number_input("Enter risk-free rate (%)", 0.0, 10.0, 2.0)
+st.title("Portfolio Optimization ")
 
 # Main content
 if st.button("Optimize"):
