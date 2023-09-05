@@ -55,7 +55,7 @@ if st.button("Optimize"):
     # normalize it, so that some is one
     weights /= np.sum(weights)
     st.header("Markowitz Portfolio Optimization")
-    st.write(f'**Normalized Weights** : {weights.flatten()}')
+    st.write(f'#**Normalized Weights** : **{weights.flatten()}**')
 
     # We generally do log return instead of return
     Markowitz_log_ret = np.log(data / data.shift(1))
