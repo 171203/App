@@ -35,15 +35,17 @@ if uploaded_file is not None:
 
 # Main content
 if st.button("Daily Returns of the Portfolio"):
+    if uploaded_file is not None:
+        st.write("**Please Upload the portfolio data file**")
     plt.figure(figsize=(20,8)) # Increases the Plot Size
     plt.grid(True)
     plt.title('Daily Close Prices of Amazon and Microsoft')
     plt.xlabel('Date: May 18th, 2012 - Dec. 30th, 2022')
     plt.ylabel('Values')
-    plt.plot(dataset['AMAZON'], 'orange', label='Amazon')
-    plt.plot(dataset['MICROSOFT'], 'blue', label='Microsoft')
-    plt.plot(dataset['FDX'], 'green', label='FDX')
-    plt.plot(dataset['Netflix'], 'red', label='Netflix')
+    plt.plot(data['AMAZON'], 'orange', label='Amazon')
+    plt.plot(data['MICROSOFT'], 'blue', label='Microsoft')
+    plt.plot(data['FDX'], 'green', label='FDX')
+    plt.plot(data['Netflix'], 'red', label='Netflix')
     plt.legend()
     plt.legend()
     plt.legend()
