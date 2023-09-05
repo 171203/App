@@ -111,19 +111,13 @@ if st.button("Optimize"):
 
         # Sharpe Ratio
         sharpe_arr[ind] = ret_arr[ind]/vol_arr[ind]
-    # plot the data
-    plt.figure(figsize=(12,8))
-    plt.scatter(vol_arr,ret_arr,c=sharpe_arr,cmap='plasma')
-    plt.colorbar(label='Sharpe Ratio')
-    plt.xlabel('Volatility')
-    plt.ylabel('Return')
-    st.pyplot(plt)
+
     max_sr_ret = ret_arr[4632]
     max_sr_vol = vol_arr[4632]
     # plot the dataplt.figure(figsize=(12,8))
     plt.scatter(vol_arr,ret_arr,c=sharpe_arr,cmap='plasma')
     plt.colorbar(label='Sharpe Ratio')
-    plt.title("Marking up Maximum Sharp Ratio with Red Color")
+    plt.title("Visualization of the Portfolio")
     plt.xlabel('Volatility')
     plt.ylabel('Return')
 
