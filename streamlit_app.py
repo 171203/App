@@ -17,7 +17,7 @@ uploaded_file = st.file_uploader("Upload a CSV file", type=["csv"])
 # Define the expected column names
 expected_columns = ["AMAZON", "MICROSOFT", "FDX", "Netflix"]
 
-if uploaded_file is None:
+if uploaded_file is not None:
     # Load the CSV file into a DataFrame
     data = pd.read_csv(uploaded_file)
 
@@ -35,7 +35,7 @@ if uploaded_file is None:
 
 # Main content
 if st.button("Daily Returns of the Portfolio"):
-    if uploaded_file is not None:
+    if uploaded_file is None:
         st.write("**Please Upload the portfolio data file**")
     plt.figure(figsize=(20,8)) # Increases the Plot Size
     plt.grid(True)
