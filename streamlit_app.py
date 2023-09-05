@@ -3,15 +3,13 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import yfinance as yf
+csv_url = "https://github.com/171203/App/blob/main/dataset.csv"
+dataset = pd.read_csv(csv_url, encoding='utf-8')
 st.title("Portfolio Optimization using Markowitz Model")
 # Main content
 if st.button("Optimize"):
     st.write("Optimizing...")
     st.title("Display CSV File in Streamlit App")
-
-    csv_url = "https://github.com/171203/App/blob/main/dataset.csv"
-    
-    dataset = pd.read_csv(csv_url, encoding='utf-8')
     
 
     # Calculate portfolio statistics
