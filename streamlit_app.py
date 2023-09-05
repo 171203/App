@@ -14,6 +14,9 @@ if st.button("Optimize"):
     st.title("Display CSV File in Streamlit App")
 
     csv_url = "https://github.com/171203/App/blob/main/dataset.csv"
+    def load_data():
+        dataset = pd.read_csv(csv_url)
+        return data
     dataset = load_data()
     st.write("Displaying CSV Data:")
     st.dataframe(dataset)
