@@ -145,18 +145,15 @@ if st.button("Train the Model"):
     st.pyplot(plt)
 
 def portfolio_volatility(weight):
-    return np.sqrt(np.dot(weight.T,
-                          np.dot(sigma,weight)))*np.sqrt(252)
+    return np.sqrt(np.dot(weight.T, np.dot(sigma,weight)))*np.sqrt(252)
 
 def portfolio_return(weight):
-
     return np.sum(mean_returns*weight)*252
 
 def portfolio_performance(weight):
     return_p = portfolio_return(weight)
     vol_p    = portfolio_volatility(weight)
     return return_p, vol_p
-
 def negativeSR(weight):
     return_p, vol_p = portfolio_performance(weight)
     rf_rate         = 0.025
@@ -172,9 +169,8 @@ def max_sharpe_ratio():
     weight_constraints = ({'type':'eq','fun': sum_one})
     w0                 = np.random.dirichlet(np.full(n_assets,0.05)).tolist()    # w0 is an initila guess
 
-    return minimize(negativeSR,w0,method='SLSQP',
-                          bounds  =((0,1),)*n_assets,
-                      constraints = weight_constraints)
+    return minimize(negativeSR,w0,method='SLSQP', bounds  =((0,1),)*n_assets, constraints = weight_constraints)
+
 def min_vol():
 
     n_assets           = log_return.shape[1]
@@ -199,7 +195,7 @@ def efficient_portfolio_target(target):
 
 def efficient_frontier(return_range):
     return [efficient_portfolio_target(ret) for ret in return_range]
-
+    
 sharpe_maximum      = max_sharpe_ratio()
 return_p,vol_p      = portfolio_performance(sharpe_maximum['x'])
 min_volatility      = min_vol()
