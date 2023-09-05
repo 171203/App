@@ -22,11 +22,6 @@ if uploaded_file is not None:
 # Main content
 if st.button("Optimize"):
     st.write("Optimizing...")
-
-    # Extract stock data from the dataset
-    stock_data = data.drop(columns=["Date"])
-    symbols = stock_data.columns
-
     # Calculate expected returns and covariance matrix
     expected_returns = stock_data.pct_change().mean() * 252
     cov_matrix = stock_data.pct_change().cov() * 252
