@@ -200,7 +200,10 @@ def efficient_portfolio_target(target):
 def efficient_frontier(return_range):
     return [efficient_portfolio_target(ret) for ret in return_range]
 
-
+sharpe_maximum      = max_sharpe_ratio()
+return_p,vol_p      = portfolio_performance(sharpe_maximum['x'])
+min_volatility      = min_vol()
+return_min,vol_min  = portfolio_performance(min_volatility['x'])
 
 if st.button('Simulation'):
     # Portfolio Simulation
@@ -220,10 +223,7 @@ if st.button('Simulation'):
         expected_vol[i]  = np.sqrt(np.dot(w.T,sigma @ w))*np.sqrt(252)
         sharpe_ratio[i] = (expected_returns[i]-rf_rate)/expected_vol[i]
 
-    sharpe_maximum      = max_sharpe_ratio()
-    return_p,vol_p      = portfolio_performance(sharpe_maximum['x'])
-    min_volatility      = min_vol()
-    return_min,vol_min  = portfolio_performance(min_volatility['x'])
+    
     plt.figure(figsize =(15,10))
     plt.style.use('ggplot')
     plt.scatter(expected_vol,expected_returns, c = sharpe_ratio)
