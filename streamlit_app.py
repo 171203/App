@@ -242,6 +242,59 @@ if st.button('Simulation'):
     plt.legend(labelspacing=0.8)
     st.pyplot(plt)
 
+def calc_portfolio_perf(weights, mean_returns, cov, rf):# portfolio performance, calculate the annualised return, sharpe ratio
+    portfolio_return = np.sum(mean_returns*weights)*252 #252 working days at the stock exchange
+    portfolio_std = np.sqrt(np.dot(weights.T,np.dot(cov,weights)))*np.sqrt(252) # np.dot multiplication of matrices
+    sharpe_ratio = (portfolio_return - rf) / portfolio_std
+    return portfolio_return, portfolio_std, sharpe_ratio
+
+def simulate_random_portfolios(num_portfolios, mean_returns, cov, rf): # random simulation
+    results_matrix = np.zeros((len(mean_returns)+3, num_portfolios))
+    for i in range(num_portfolios):
+        weights=np.random.random(len(mean_returns))
+        weights /= np.sum(weights)
+        portfolio_return, portfolio_std, sharpe_ratio = calc_portfolio_perf(weights, mean_returns, cov, rf)
+        results_matrix[0,i] = portfolio_return
+        results_matrix[1,i] = portfolio_std
+        results_matrix[2,i] = sharpe_ratio
+        #iterate through the weight vector and add data to results array
+        for j in range(len(weights)):
+            results_matrix[j+3,i] = weights[j]
+    results_df = pd.DataFrame(results_matrix.T,columns=['ret','stdev','sharpe'] + [ticker for ticker in tickers])
+    return results_df
+
+if st.button("Portfolio Optimization"):
+    tickers = []
+    for i in dataset[['AMAZON','MICROSOFT','FDX','Netflix']].columns:
+        tickers.append(i)
+
+    mean_returns = dataset[['AMAZON','MICROSOFT','FDX','Netflix']].pct_change().mean()
+    cov = dataset[['AMAZON','MICROSOFT','FDX','Netflix']].pct_change().cov()
+    num_portfolios = 10000
+    rf = 0.025
+    results_frame =simulate_random_portfolios(num_portfolios, mean_returns,cov, rf)
+    results_frame.sum(axis=1)-results_frame["ret"]-results_frame["stdev"]-results_frame["sharpe"];
+  
+    max_sharpe_port=results_frame.iloc[results_frame["sharpe"].idxmax()] # max sharp ratio rouge
+    
+    min_vol_port = results_frame.iloc[results_frame["stdev"].idxmin()] # min volatility = min variance portfolio vert
+   
+    plt.subplots(figsize=(15,10)) # Number of rows/colums of the subplot grid
+    plt.scatter(results_frame.stdev,results_frame.ret,c=results_frame.sharpe,cmap='plasma') #Colormaps in Matplotlib
+    plt.title('Optimization of the portfolio',fontdict=font1)
+    plt.xlabel('Risk/Annualised Volatility',fontdict=font2)
+    plt.ylabel('Annualised Returns',fontdict=font2)
+    
+    plt.colorbar().set_label('Sharpe Ratio', size= 20, color = 'g', family='serif',weight='bold')
+    target               = np.linspace(return_min,1.02,100)
+    
+    plt.scatter(max_sharpe_port[1],max_sharpe_port[0],marker=(5,1,0),color='r',s=500, label = 'Maximum Sharpe Ratio')
+    
+    plt.scatter(min_vol_port[1] ,min_vol_port[0],marker=(5,1,0),color='g', s=500, label='Minimum Volatility Portfolio')
+    plt.legend(labelspacing=0.8)
+    plt.savefig('Portfolio_Optimization_Efficient_Frontier.pdf')
+    st.pyplot(plt)
+
 
     
     
