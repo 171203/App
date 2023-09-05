@@ -62,7 +62,7 @@ if st.button("Optimize"):
 
     # Sharpe ratio
     Markowitz_sr = Markowitz_exp_ret / Markowitz_exp_vol
-    print(f'\nSharpe ratio of the portfolio: {Markowitz_sr[0][0]}')
+    st.write(f'\nSharpe ratio of the portfolio: {Markowitz_sr[0][0]}')
 
     # Display portfolio composition
     st.subheader("Portfolio Composition")
@@ -90,6 +90,12 @@ if st.button("Optimize"):
 
         # Sharpe Ratio
         sharpe_arr[ind] = ret_arr[ind]/vol_arr[ind]
+    # plot the data
+    plt.figure(figsize=(12,8))
+    plt.scatter(vol_arr,ret_arr,c=sharpe_arr,cmap='plasma')
+    plt.colorbar(label='Sharpe Ratio')
+    plt.xlabel('Volatility')
+    plt.ylabel('Return')
 
    
 
