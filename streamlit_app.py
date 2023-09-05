@@ -1,90 +1,66 @@
-pip install streamlit pandas numpy matplotlib
 import streamlit as st
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-pip install cvxpy
-import cvxpy as cp
 
-# Load historical price data from a CSV file
-@st.cache
-def load_data():
-    data = pd.read_csv('your_stock_data.csv')
-    return data
-
-data = load_data()
-
-# Streamlit App
-st.title('Portfolio Optimization App')
+st.title("Portfolio Optimization using Markowitz Model")
 
 # Sidebar
-st.sidebar.header('User Input')
-selected_stocks = st.sidebar.multiselect('Select Stocks for Your Portfolio', data.columns[1:])
+st.sidebar.header("Portfolio Inputs")
+st.sidebar.write("Enter the details of your portfolio:")
 
-# Display selected stocks
-st.write('You have selected the following stocks:')
-st.write(selected_stocks)
+# Stock Input
+st.sidebar.subheader("Stock Data (Ticker, Number of Shares)")
+stock_data = st.sidebar.text_area("Enter stock data (ticker, shares)", "AAPL,100\nGOOGL,50\nAMZN,75")
 
-# Load selected data
-selected_data = data[['Date'] + selected_stocks]
+# Expected Returns Input
+st.sidebar.subheader("Expected Annual Returns (%)")
+expected_returns = st.sidebar.text_area("Enter expected annual returns (%)", "AAPL,10\nGOOGL,15\nAMZN,12")
 
-# Calculate daily returns
-returns = selected_data[selected_stocks].pct_change()
-returns.dropna(inplace=True)
+# Risk-Free Rate Input
+st.sidebar.subheader("Risk-Free Rate (%)")
+risk_free_rate = st.sidebar.number_input("Enter risk-free rate (%)", 0.0, 10.0, 2.0)
 
-# Mean returns and covariance matrix
-mean_returns = returns.mean()
-cov_matrix = returns.cov()
+# Main content
+if st.button("Optimize"):
+    # Parse stock data and expected returns
+    stock_data = [line.split(',') for line in stock_data.split('\n')]
+    stock_data = [(symbol.strip(), float(shares.strip())) for symbol, shares in stock_data if symbol and shares]
 
-# Display mean returns and covariance matrix
-st.write('Mean Returns:')
-st.write(mean_returns)
-st.write('Covariance Matrix:')
-st.write(cov_matrix)
+    expected_returns = [line.split(',') for line in expected_returns.split('\n')]
+    expected_returns = [(symbol.strip(), float(returns.strip())) for symbol, returns in expected_returns if symbol and returns]
 
-# Portfolio Optimization
-st.header('Portfolio Optimization')
+    if not stock_data or not expected_returns:
+        st.warning("Please enter valid stock data and expected returns.")
+    else:
+        # Calculate portfolio statistics
+        symbols, shares = zip(*stock_data)
+        portfolio_data = pd.DataFrame({'Symbol': symbols, 'Shares': shares})
+        portfolio_data.set_index('Symbol', inplace=True)
 
-# User-defined risk tolerance
-st.sidebar.slider('Risk Tolerance', min_value=0.0, max_value=1.0, step=0.01, value=0.2)
+        expected_returns = dict(expected_returns)
+        portfolio_data['Expected Return (%)'] = portfolio_data.index.map(expected_returns)
+        portfolio_data['Weight'] = portfolio_data['Shares'] / portfolio_data['Shares'].sum()
+        
+        portfolio_returns = portfolio_data['Weight'] * portfolio_data['Expected Return (%)']
+        portfolio_volatility = np.sqrt(np.dot(portfolio_returns, np.dot(np.cov(portfolio_returns, rowvar=False), portfolio_returns)))
 
-# Portfolio Optimization
-n_assets = len(selected_stocks)
-weights = cp.Variable(n_assets)
-risk_tolerance = st.sidebar.slider('Risk Tolerance', min_value=0.0, max_value=1.0, step=0.01, value=0.2)
+        # Calculate Sharpe Ratio
+        sharpe_ratio = (portfolio_returns.sum() - risk_free_rate) / portfolio_volatility
 
-# Portfolio Expected Return
-portfolio_return = cp.sum(weights * mean_returns)
-# Portfolio Risk (standard deviation)
-portfolio_risk = cp.quad_form(weights, cov_matrix)
+        # Display portfolio data
+        st.subheader("Portfolio Data")
+        st.write(portfolio_data)
 
-# Portfolio Optimization Problem
-objective = cp.Maximize(portfolio_return - risk_tolerance * portfolio_risk)
-constraints = [cp.sum(weights) == 1, weights >= 0]
-problem = cp.Problem(objective, constraints)
+        # Display portfolio statistics
+        st.subheader("Portfolio Statistics")
+        st.write(f"Portfolio Expected Return: {portfolio_returns.sum():.2f}%")
+        st.write(f"Portfolio Volatility: {portfolio_volatility:.2f}%")
+        st.write(f"Sharpe Ratio: {sharpe_ratio:.2f}")
 
-# Solve the optimization problem
-problem.solve()
+        # Plot portfolio composition
+        st.subheader("Portfolio Composition")
+        plt.pie(portfolio_data['Weight'], labels=portfolio_data.index, autopct='%1.1f%%', startangle=140)
+        st.pyplot(plt)
 
-# Display portfolio weights
-st.write('Portfolio Weights:')
-st.write(weights.value)
-
-# Visualization
-st.header('Portfolio Performance')
-
-# Portfolio Returns and Risk
-portfolio_returns = np.sum(mean_returns * weights.value)
-portfolio_volatility = np.sqrt(np.dot(weights.value.T, np.dot(cov_matrix, weights.value)))
-
-# Display portfolio performance metrics
-st.write('Expected Portfolio Return:', portfolio_returns)
-st.write('Expected Portfolio Risk (Volatility):', portfolio_volatility)
-
-# Plotting
-st.header('Portfolio Allocation')
-fig, ax = plt.subplots()
-ax.pie(weights.value, labels=selected_stocks, autopct='%1.1f%%', shadow=True, startangle=90)
-ax.axis('equal')
-st.pyplot(fig)
 
