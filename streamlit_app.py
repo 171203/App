@@ -4,31 +4,20 @@ import numpy as np
 import matplotlib.pyplot as plt
 import yfinance as yf
 
-# Function to download stock data
-def download_stock_data():
-    AMZN = yf.download("AMZN", start="2012-05-18", end="2023-01-01")
-    MSFT = yf.download("MSFT", start="2012-05-18", end="2023-01-01")
-    NFLX = yf.download("NFLX", start="2012-05-18", end="2023-01-01")
-    FDX = yf.download("FDX", start="2012-05-18", end="2023-01-01")
-
-    return AMZN['Adj Close'], MSFT['Adj Close'], NFLX['Adj Close'], FDX['Adj Close']
+AMZN = yf.download("AMZN", start="2012-05-18", end="2023-01-01")
+MSFT = yf.download("MSFT", start="2012-05-18", end="2023-01-01")
+NFLX = yf.download("NFLX", start="2012-05-18", end="2023-01-01")
+FDX = yf.download("FDX", start="2012-05-18", end="2023-01-01")
+AMZN_AJClose = AMZN['Adj Close']
+MSFT_AJClose = MSFT['Adj Close']
+FDX_AJClose =  FDX['Adj Close']
+NFLX_AJClose = NFLX['Adj Close']
 
 st.title("Portfolio Optimization using Markowitz Model")
-
-# Sidebar
-st.sidebar.header("Portfolio Inputs")
-st.sidebar.write("Enter the details of your portfolio:")
-
-# Risk-Free Rate Input
-st.sidebar.subheader("Risk-Free Rate (%)")
-risk_free_rate = st.sidebar.number_input("Enter risk-free rate (%)", 0.0, 10.0, 2.0)
-
 # Main content
 if st.button("Optimize"):
     st.write("Optimizing...")
 
-    # Download stock data
-    AMZN_AJClose, MSFT_AJClose, NFLX_AJClose, FDX_AJClose = download_stock_data()
     
     dataset = pd.concat([AMZN_AJClose, MSFT_AJClose, FDX_AJClose, NFLX_AJClose], axis=1)
     
