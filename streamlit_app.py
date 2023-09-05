@@ -13,10 +13,20 @@ def download_stock_data():
 
     return AMZN['Adj Close'], MSFT['Adj Close'], NFLX['Adj Close'], FDX['Adj Close']
 
-st.title("Portfolio Optimization ")
+st.title("Portfolio Optimization using Markowitz Model")
+
+# Sidebar
+st.sidebar.header("Portfolio Inputs")
+st.sidebar.write("Enter the details of your portfolio:")
+
+# Risk-Free Rate Input
+st.sidebar.subheader("Risk-Free Rate (%)")
+risk_free_rate = st.sidebar.number_input("Enter risk-free rate (%)", 0.0, 10.0, 2.0)
 
 # Main content
 if st.button("Optimize"):
+    st.write("Optimizing...")
+
     # Download stock data
     AMZN_AJClose, MSFT_AJClose, NFLX_AJClose, FDX_AJClose = download_stock_data()
     
@@ -53,6 +63,7 @@ if st.button("Optimize"):
     # Plot portfolio composition
     plt.pie(weights, labels=dataset.columns, autopct='%1.1f%%', startangle=140)
     st.pyplot(plt)
+
 
 
 
