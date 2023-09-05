@@ -107,9 +107,10 @@ if st.button("Implementing the Optimization Algorithm"):
     Markowitz_sr = Markowitz_exp_ret / Markowitz_exp_vol
     st.write(f'\nSharpe ratio of the portfolio: **{Markowitz_sr[0][0]}**')
 
-log_return = np.log(data / data.shift(1))
+
     
 if st.button("Train the Model"):
+    log_return = np.log(data / data.shift(1))
     num_ports = 5000
     all_weights = np.zeros((num_ports, len(data.columns)))
     ret_arr = np.zeros(num_ports)
