@@ -3,7 +3,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import yfinance as yf
-import scipy.optimize as minimizer
+from scipy.optimize import minimize
 
 def log_returns(prices):
     return np.log(prices / prices.shift(1))
