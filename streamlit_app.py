@@ -34,7 +34,7 @@ if uploaded_file is not None:
         st.header("Portfolio Optimization")
 
 # Main content
-if st.button("#**Box Plot Display**"):
+if st.button("Box Plot Display", key="colorful_button"):
     plt.style.use("fivethirtyeight")
     data[['AMAZON','MICROSOFT','FDX', 'Netflix']].boxplot()
     plt.title("Boxplot of Stock Prices (Amazon, Microsoft, FDX, Netflix,)")
