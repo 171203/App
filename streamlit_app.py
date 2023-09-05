@@ -34,7 +34,8 @@ if st.button("Optimize"):
     # Calculate expected returns and covariance matrix
     expected_returns = data.pct_change().mean() * 252
     cov_matrix = data.pct_change().cov() * 252
-
+    weights = np.array(np.random.random(4))
+    weights = weights/np.sum(weights)
     np.random.seed(1)
     # Weight each security
     weights = np.random.random((4,1))
@@ -58,18 +59,7 @@ if st.button("Optimize"):
     Markowitz_sr = Markowitz_exp_ret / Markowitz_exp_vol
     print(f'\nSharpe ratio of the portfolio: {Markowitz_sr[0][0]}')
 
-    # Calculate portfolio returns and volatility
-    portfolio_return = np.sum(weights * expected_returns)
-    portfolio_stddev = np.sqrt(np.dot(weights.T, np.dot(cov_matrix, weights)))
-
-    # Calculate Sharpe Ratio
-    sharpe_ratio = (portfolio_return - risk_free_rate) / portfolio_stddev
-
-    # Display portfolio statistics
-    st.subheader("Portfolio Statistics")
-    st.write(f"Portfolio Expected Return: {portfolio_return:.2%}")
-    st.write(f"Portfolio Volatility: {portfolio_stddev:.2%}")
-    st.write(f"Sharpe Ratio: {sharpe_ratio:.2f}")
+    
 
     # Display portfolio composition
     st.subheader("Portfolio Composition")
