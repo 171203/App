@@ -36,7 +36,7 @@ if uploaded_file is not None:
 # Main content
 if st.button("Daily Returns of the Portfolio"):
     if uploaded_file is None:
-        st.write("**Please Upload the portfolio data file**")
+        st.error("**Please Upload the portfolio data file**")
     plt.figure(figsize=(20,8)) # Increases the Plot Size
     plt.grid(True)
     plt.title('Daily Close Prices of Amazon and Microsoft')
