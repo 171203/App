@@ -3,22 +3,34 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import yfinance as yf
-csv_url = "https://github.com/171203/App/blob/main/dataset.csv"
-dataset = pd.read_csv(csv_url, encoding='utf-8')
+
 st.title("Portfolio Optimization using Markowitz Model")
+
+# Load the CSV file from GitHub
+@st.cache
+def load_data():
+    url = "https://github.com/171203/App/blob/main/dataset.csv"
+    data = pd.read_csv(url)
+    return data
+
+data = load_data()
+
+
 # Main content
 if st.button("Optimize"):
     st.write("Optimizing...")
-    st.title("Display CSV File in Streamlit App")
-    
 
-    # Calculate portfolio statistics
-    expected_returns = dataset.pct_change().mean() * 252
-    cov_matrix = dataset.pct_change().cov() * 252
+    # Extract stock data from the dataset
+    stock_data = data.drop(columns=["Date"])
+    symbols = stock_data.columns
 
-    num_assets = len(dataset.columns)
+    # Calculate expected returns and covariance matrix
+    expected_returns = stock_data.pct_change().mean() * 252
+    cov_matrix = stock_data.pct_change().cov() * 252
 
-    # Generate random weights for the portfolio
+    num_assets = len(symbols)
+
+    # Generate random portfolio weights
     weights = np.random.random(num_assets)
     weights /= np.sum(weights)
 
@@ -41,8 +53,9 @@ if st.button("Optimize"):
     st.write(weights)
 
     # Plot portfolio composition
-    plt.pie(weights, labels=dataset.columns, autopct='%1.1f%%', startangle=140)
+    plt.pie(weights, labels=symbols, autopct='%1.1f%%', startangle=140)
     st.pyplot(plt)
+
 
 
 
