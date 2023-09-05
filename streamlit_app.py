@@ -46,8 +46,8 @@ if st.button("Optimize"):
     weights = np.random.random((4,1))
     # normalize it, so that some is one
     weights /= np.sum(weights)
-    st.write("*****************   Markowitz Portfolio Optimization   **********************")
-    st.write(f'Normalized Weights : {weights.flatten()}')
+    st.header("Markowitz Portfolio Optimization")
+    st.write(f'**Normalized Weights** : {weights.flatten()}')
 
     # We generally do log return instead of return
     Markowitz_log_ret = np.log(data / data.shift(1))
@@ -64,10 +64,7 @@ if st.button("Optimize"):
     Markowitz_sr = Markowitz_exp_ret / Markowitz_exp_vol
     st.write(f'\nSharpe ratio of the portfolio: {Markowitz_sr[0][0]}')
 
-    # Display portfolio composition
-    st.subheader("Portfolio Composition")
-    st.write("Optimal Weights:")
-    st.write(weights)
+
     log_return = log_returns(prices=data).dropna()
     num_ports = 5000
     all_weights = np.zeros((num_ports, len(data.columns)))
