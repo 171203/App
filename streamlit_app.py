@@ -6,22 +6,18 @@ import yfinance as yf
 
 st.title("Portfolio Optimization using Markowitz Model")
 
-# Load the CSV file from GitHub
-@st.cache
-def load_data():
-    url = "https://github.com/171203/App/blob/main/data.csv"
-    data = pd.read_csv(url)
-    return data
+st.title("CSV File Viewer")
 
-data = load_data()
+# Upload the CSV file
+uploaded_file = st.file_uploader("Choose a CSV file", type=["csv"])
 
-# Sidebar
-st.sidebar.header("Portfolio Inputs")
-st.sidebar.write("Enter the details of your portfolio:")
+if uploaded_file is not None:
+    # Read the CSV file into a DataFrame
+    data = pd.read_csv(uploaded_file)
 
-# Risk-Free Rate Input
-st.sidebar.subheader("Risk-Free Rate (%)")
-risk_free_rate = st.sidebar.number_input("Enter risk-free rate (%)", 0.0, 10.0, 2.0)
+    # Display the data in the DataFrame
+    st.write("CSV Data:")
+    st.dataframe(data)
 
 # Main content
 if st.button("Optimize"):
