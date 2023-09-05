@@ -8,18 +8,7 @@ st.title("Portfolio Optimization using Markowitz Model")
 # Main content
 if st.button("Optimize"):
     st.write("Optimizing...")
-    AMZN = yf.download("AMZN", start="2012-05-18", end="2023-01-01")
-    MSFT = yf.download("MSFT", start="2012-05-18", end="2023-01-01")
-    NFLX = yf.download("NFLX", start="2012-05-18", end="2023-01-01")
-    FDX = yf.download("FDX", start="2012-05-18", end="2023-01-01")
-    AMZN_AJClose = AMZN['Adj Close']
-    MSFT_AJClose = MSFT['Adj Close']
-    FDX_AJClose =  FDX['Adj Close']
-    NFLX_AJClose = NFLX['Adj Close']
-
-    
-    dataset = pd.concat([AMZN_AJClose, MSFT_AJClose, FDX_AJClose, NFLX_AJClose], axis=1)
-    
+    st.write(dataset)
     # Calculate portfolio statistics
     expected_returns = dataset.pct_change().mean() * 252
     cov_matrix = dataset.pct_change().cov() * 252
