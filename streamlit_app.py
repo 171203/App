@@ -96,7 +96,7 @@ if st.button("Optimize"):
     plt.colorbar(label='Sharpe Ratio')
     plt.xlabel('Volatility')
     plt.ylabel('Return')
-    st.pyplot()
+    st.pyplot(plt)
 
    
 
