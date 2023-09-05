@@ -198,13 +198,14 @@ def efficient_portfolio_target(target):
 def efficient_frontier(return_range):
     return [efficient_portfolio_target(ret) for ret in return_range]
     
-sharpe_maximum      = max_sharpe_ratio()
-return_p,vol_p      = portfolio_performance(sharpe_maximum['x'])
-min_volatility      = min_vol()
-return_min,vol_min  = portfolio_performance(min_volatility['x'])
+
 
 if st.button('Simulation'):
     # Portfolio Simulation
+    sharpe_maximum      = max_sharpe_ratio()
+    return_p,vol_p      = portfolio_performance(sharpe_maximum['x'])
+    min_volatility      = min_vol()
+    return_min,vol_min  = portfolio_performance(min_volatility['x'])
     portfolio        = 2673  # generation of a portfolio
     n_assets         = log_return.shape[1]
     weights          = np.random.dirichlet(np.full(n_assets,0.05),portfolio)
@@ -265,7 +266,10 @@ if st.button("Portfolio Optimization"):
     tickers = []
     for i in data[['AMAZON','MICROSOFT','FDX','Netflix']].columns:
         tickers.append(i)
-
+    sharpe_maximum      = max_sharpe_ratio()
+    return_p,vol_p      = portfolio_performance(sharpe_maximum['x'])
+    min_volatility      = min_vol()
+    return_min,vol_min  = portfolio_performance(min_volatility['x'])
     mean_returns = data[['AMAZON','MICROSOFT','FDX','Netflix']].pct_change().mean()
     cov = data[['AMAZON','MICROSOFT','FDX','Netflix']].pct_change().cov()
     num_portfolios = 10000
