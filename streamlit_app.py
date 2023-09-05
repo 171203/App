@@ -34,12 +34,12 @@ if uploaded_file is not None:
         st.header("Portfolio Optimization")
 
 # Main content
-if st.button("Box Plot Display", key="colorful_button"):
+if st.button("**Box Plot Display**", key="green_button"):
     plt.style.use("fivethirtyeight")
     data[['AMAZON','MICROSOFT','FDX', 'Netflix']].boxplot()
     plt.title("Boxplot of Stock Prices (Amazon, Microsoft, FDX, Netflix,)")
     st.pyplot(plt)
-if st.button("#**Optimize**"):
+if st.button("**Optimize**", key="green_button"):
     st.write("**Optimizing...**")
     # Calculate expected returns and covariance matrix
     expected_returns = data.pct_change().mean() * 252
