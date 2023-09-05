@@ -23,14 +23,31 @@ if uploaded_file is not None:
 if st.button("Optimize"):
     st.write("Optimizing...")
     # Calculate expected returns and covariance matrix
-    expected_returns = stock_data.pct_change().mean() * 252
-    cov_matrix = stock_data.pct_change().cov() * 252
+    expected_returns = data.pct_change().mean() * 252
+    cov_matrix = data.pct_change().cov() * 252
 
-    num_assets = len(symbols)
-
-    # Generate random portfolio weights
-    weights = np.random.random(num_assets)
+    np.random.seed(1)
+    # Weight each security
+    weights = np.random.random((4,1))
+    # normalize it, so that some is one
     weights /= np.sum(weights)
+    st.write("*****************   Markowitz Portfolio Optimization   **********************")
+    st.write('Normalized Weights : {weights.flatten()}')
+
+    # We generally do log return instead of return
+    Markowitz_log_ret = np.log(dataset / dataset.shift(1))
+
+    # Expected return (weighted sum of mean returns). Mult by 252 as we always do annual calculation and year has 252 business days
+    Markowitz_exp_ret = Markowitz_log_ret.mean().dot(weights)*252
+    st.write('\nExpected return of the portfolio is : {Markowitz_exp_ret[0]}')
+
+    # Exp Volatility (Risk)
+    Markowitz_exp_vol = np.sqrt(weights.T.dot(252*Markowitz_log_ret.cov().dot(weights)))
+    st.write(f'\nVolatility of the portfolio: {Markowitz_exp_vol[0][0]}')
+
+    # Sharpe ratio
+    Markowitz_sr = Markowitz_exp_ret / Markowitz_exp_vol
+    print(f'\nSharpe ratio of the portfolio: {Markowitz_sr[0][0]}')
 
     # Calculate portfolio returns and volatility
     portfolio_return = np.sum(weights * expected_returns)
