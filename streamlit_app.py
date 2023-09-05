@@ -164,7 +164,7 @@ if st.button("Implementing the Optimization Algorithm"):
         opts = minimizer.minimize(taget_fun, x0=equally_weighted_portfolio, args=mv_return, method="SLSQP", bounds=bounds, constraints=cons)
         min_var_portfolio = opts['x'].round(3)
         st.write('**Minimum variance Optimization:**')
-        st.write('**Expected Return:**',portfolio_return(min_var_portfolio, mv_return)**)
+        st.write('**Expected Return:**',portfolio_return(min_var_portfolio, mv_return))
         st.write('**Expected Volatility:**',portfolio_volatility(min_var_portfolio, mv_return))
         st.write('**Sharpe Ratio**', -round(expected_sharpe(min_var_portfolio, mv_return), 2))
     
