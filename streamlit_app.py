@@ -19,7 +19,7 @@ if uploaded_file is not None:
     # Check if the DataFrame contains the expected columns
     if not set(expected_columns).issubset(data.columns):
         st.error("Warning: The given dataset is not suitable for the Optimization")
-        st.error("Error: Please upload the Portfolio Dataset.")
+        st.error("Error: Please upload the daatset named My_Portfolio.")
     else:
         # Display the uploaded data
         st.write("Uploaded CSV Data:")
