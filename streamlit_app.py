@@ -15,8 +15,8 @@ if st.button("Optimize"):
 
     csv_url = "https://github.com/171203/App/blob/main/dataset.csv"
     def load_data():
-        dataset = pd.read_csv(csv_url)
-        return data
+        dataset = pd.read_csv(csv_url, encoding='utf-8')
+        return dataset
     dataset = load_data()
     st.write("Displaying CSV Data:")
     st.dataframe(dataset)
