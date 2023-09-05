@@ -1,7 +1,7 @@
+pip install streamlit pandas numpy matplotlib
 import streamlit as st
 import pandas as pd
 import numpy as np
-pip install matplotlib.pyplot
 import matplotlib.pyplot as plt
 pip install cvxpy
 import cvxpy as cp
