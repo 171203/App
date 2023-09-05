@@ -3,11 +3,24 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import yfinance as yf
+
 def log_returns(prices):
     return np.log(prices / prices.shift(1))
 
 def arithmetic_returns(prices):
     return prices/prices.shift(1) - 1
+    
+def portfolio_return(weights, returns):
+    return np.sum(np.mean(returns, axis=1) * weights) * 252
+
+def portfolio_volatility(weights, returns):
+    return np.sqrt(np.dot(weights.T, np.dot(np.cov(returns) * 252, weights)))
+    
+def expected_sharpe(weights, *args):
+    # get the asset's returns
+    returns = args[0]
+    return - portfolio_return(weights, returns) / portfolio_volatility(weights, returns)
+
 
 st.title("Portfolio Optimization using Markowitz Model")
 
@@ -124,6 +137,9 @@ if st.button("Optimize"):
     # add a red dot for max_sr_vol & max_sr_ret
     plt.scatter(max_sr_vol, max_sr_ret, c='red', s=50, edgecolors='black')
     st.pyplot(plt)
+
+    df_returns = log_return.copy()
+    mv_return = log_return.T.values
 
    
 
