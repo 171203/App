@@ -107,66 +107,66 @@ if st.button("Implementing the Optimization Algorithm"):
     st.write(f'\nSharpe ratio of the portfolio: **{Markowitz_sr[0][0]}**')
     log_return = log_returns(prices=data).dropna()
     
-    if st.button("Train the Model"):
-        num_ports = 5000
-        all_weights = np.zeros((num_ports, len(data.columns)))
-        ret_arr = np.zeros(num_ports)
-        vol_arr = np.zeros(num_ports)
-        sharpe_arr = np.zeros(num_ports)
+if st.button("Train the Model"):
+    num_ports = 5000
+    all_weights = np.zeros((num_ports, len(data.columns)))
+    ret_arr = np.zeros(num_ports)
+    vol_arr = np.zeros(num_ports)
+    sharpe_arr = np.zeros(num_ports)
 
-        for ind in range(num_ports):
-            weights = np.array(np.random.random(4))
-            weights = weights/np.sum(weights)
+    for ind in range(num_ports):
+        weights = np.array(np.random.random(4))
+        weights = weights/np.sum(weights)
 
-            # save the weights
-            all_weights[ind,:] = weights
+        # save the weights
+        all_weights[ind,:] = weights
 
-            # expected return
-            ret_arr[ind] = np.sum((log_return.mean()*weights)*252)
+        # expected return
+        ret_arr[ind] = np.sum((log_return.mean()*weights)*252)
 
-            # expected volatility
-            vol_arr[ind] = np.sqrt(np.dot(weights.T,np.dot(log_return.cov()*252, weights)))
+        # expected volatility
+        vol_arr[ind] = np.sqrt(np.dot(weights.T,np.dot(log_return.cov()*252, weights)))
 
-            # Sharpe Ratio
-            sharpe_arr[ind] = ret_arr[ind]/vol_arr[ind]
+        # Sharpe Ratio
+        sharpe_arr[ind] = ret_arr[ind]/vol_arr[ind]
 
-            max_sr_ret = ret_arr[4632]
-            max_sr_vol = vol_arr[4632]
-            # plot the dataplt.figure(figsize=(12,8))
-            plt.scatter(vol_arr,ret_arr,c=sharpe_arr,cmap='plasma')
-            plt.colorbar(label='Sharpe Ratio')
-            plt.title("Visualization of the Portfolio")
-            plt.xlabel('Volatility')
-            plt.ylabel('Return')
+        max_sr_ret = ret_arr[4632]
+        max_sr_vol = vol_arr[4632]
+        # plot the dataplt.figure(figsize=(12,8))
+        plt.scatter(vol_arr,ret_arr,c=sharpe_arr,cmap='plasma')
+        plt.colorbar(label='Sharpe Ratio')
+        plt.title("Visualization of the Portfolio")
+        plt.xlabel('Volatility')
+        plt.ylabel('Return')
 
-            # add a red dot for max_sr_vol & max_sr_ret
-            plt.scatter(max_sr_vol, max_sr_ret, c='red', s=50, edgecolors='black')
-            st.pyplot(plt)
+        # add a red dot for max_sr_vol & max_sr_ret
+        plt.scatter(max_sr_vol, max_sr_ret, c='red', s=50, edgecolors='black')
+        st.pyplot(plt)
 
     # Minimum Variance Portfolio Optimization
-    if st.button("Minimum Variance Optimization"):
-        df_returns = log_return.copy()
-        mv_return = log_return.T.values
-        bounds = tuple((0, 1) for x in range(len(mv_return)))
-        equally_weighted_portfolio = np.array([1 / len(mv_return) for x in range(len(mv_return))])
-        opts = minimizer.minimize(expected_sharpe, x0=equally_weighted_portfolio, args=mv_return, method="SLSQP", bounds=bounds, constraints=cons)
-        return_target = portfolio_return(equally_weighted_portfolio, mv_return)
-        cons = ({'type': 'eq',
+if st.button("Minimum Variance Optimization"):
+    df_returns = log_return.copy()
+    mv_return = log_return.T.values
+    bounds = tuple((0, 1) for x in range(len(mv_return)))
+    equally_weighted_portfolio = np.array([1 / len(mv_return) for x in range(len(mv_return))])
+    opts = minimizer.minimize(expected_sharpe, x0=equally_weighted_portfolio, args=mv_return, method="SLSQP", bounds=bounds, constraints=cons)
+    return_target = portfolio_return(equally_weighted_portfolio, mv_return)
+    cons = ({'type': 'eq',
          'fun': lambda x: np.sum(np.mean(mv_return, axis=1) * x) * 252 - return_target
          },
          {
          'type': 'eq',
          'fun': lambda x: np.sum(x) - 1
 
-         })
-        bounds = tuple((0, 1) for x in range(len(mv_return)))
-        equally_weighted_portfolio = np.array([1 / len(mv_return) for x in range(len(mv_return))])
-        opts = minimizer.minimize(taget_fun, x0=equally_weighted_portfolio, args=mv_return, method="SLSQP", bounds=bounds, constraints=cons)
-        min_var_portfolio = opts['x'].round(3)
-        st.write('**Minimum variance Optimization:**')
-        st.write('**Expected Return:**',portfolio_return(min_var_portfolio, mv_return))
-        st.write('**Expected Volatility:**',portfolio_volatility(min_var_portfolio, mv_return))
-        st.write('**Sharpe Ratio**', -round(expected_sharpe(min_var_portfolio, mv_return), 2))
+         })  
+    bounds = tuple((0, 1) for x in range(len(mv_return)))
+    equally_weighted_portfolio = np.array([1 / len(mv_return) for x in range(len(mv_return))])
+    opts = minimizer.minimize(taget_fun, x0=equally_weighted_portfolio, args=mv_return, method="SLSQP", bounds=bounds, constraints=cons)
+    min_var_portfolio = opts['x'].round(3)
+    st.write('**Minimum variance Optimization:**')
+    st.write('**Expected Return:**',portfolio_return(min_var_portfolio, mv_return))
+    st.write('**Expected Volatility:**',portfolio_volatility(min_var_portfolio, mv_return))
+    st.write('**Sharpe Ratio**', -round(expected_sharpe(min_var_portfolio, mv_return), 2))
     
 
    
