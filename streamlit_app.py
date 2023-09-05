@@ -281,6 +281,8 @@ if st.button("Portfolio Optimization"):
    
     plt.subplots(figsize=(15,10)) # Number of rows/colums of the subplot grid
     plt.scatter(results_frame.stdev,results_frame.ret,c=results_frame.sharpe,cmap='plasma') #Colormaps in Matplotlib
+    font1 = {'family':'serif','color':'darkred','size':20,'weight':'bold'}
+    font2 = {'family':'serif','color':'darkred','size':20,'weight':'bold'}
     plt.title('Optimization of the portfolio',fontdict=font1)
     plt.xlabel('Risk/Annualised Volatility',fontdict=font2)
     plt.ylabel('Annualised Returns',fontdict=font2)
