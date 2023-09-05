@@ -202,6 +202,7 @@ def efficient_frontier(return_range):
 
 if st.button('Simulation'):
     # Portfolio Simulation
+    log_return = np.log(data / data.shift(1))
     sharpe_maximum      = max_sharpe_ratio()
     return_p,vol_p      = portfolio_performance(sharpe_maximum['x'])
     min_volatility      = min_vol()
@@ -263,6 +264,7 @@ def simulate_random_portfolios(num_portfolios, mean_returns, cov, rf): # random 
     return results_df
 
 if st.button("Portfolio Optimization"):
+    log_return = np.log(data / data.shift(1))
     tickers = []
     for i in data[['AMAZON','MICROSOFT','FDX','Netflix']].columns:
         tickers.append(i)
