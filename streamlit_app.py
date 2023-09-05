@@ -64,7 +64,7 @@ if st.button("Optimize"):
     st.write("Optimal Weights:")
     st.write(weights)
     num_ports = 5000
-    all_weights = np.zeros((num_ports, len(dataset.columns)))
+    all_weights = np.zeros((num_ports, len(data.columns)))
     ret_arr = np.zeros(num_ports)
     vol_arr = np.zeros(num_ports)
     sharpe_arr = np.zeros(num_ports)
