@@ -8,8 +8,6 @@ from scipy.optimize import minimize
 def log_returns(prices):
     return np.log(prices / prices.shift(1))
 
-log_return = log_returns(prices=data).dropna()
-
 def arithmetic_returns(prices):
     return prices/prices.shift(1) - 1
     
@@ -52,6 +50,8 @@ if uploaded_file is not None:
 
         # Portfolio Optimization
         st.header("Portfolio Optimization")
+
+log_return = log_returns(prices=data).dropna()
 
 # Main content
 if st.button("Daily Returns of the Portfolio"):
