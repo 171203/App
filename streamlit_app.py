@@ -286,13 +286,12 @@ if st.button("Portfolio Optimization"):
     plt.ylabel('Annualised Returns',fontdict=font2)
     
     plt.colorbar().set_label('Sharpe Ratio', size= 20, color = 'g', family='serif',weight='bold')
-    target               = np.linspace(return_min,1.02,100)
+    target  = np.linspace(return_min,1.02,100)
     
     plt.scatter(max_sharpe_port[1],max_sharpe_port[0],marker=(5,1,0),color='r',s=500, label = 'Maximum Sharpe Ratio')
     
     plt.scatter(min_vol_port[1] ,min_vol_port[0],marker=(5,1,0),color='g', s=500, label='Minimum Volatility Portfolio')
     plt.legend(labelspacing=0.8)
-    plt.savefig('Portfolio_Optimization_Efficient_Frontier.pdf')
     st.pyplot(plt)
 
 
