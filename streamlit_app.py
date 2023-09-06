@@ -27,6 +27,17 @@ if uploaded_file is not None:
 
         # Portfolio Optimization
         st.header("Portfolio Optimization")
+def max_sharpe_ratio():
+
+    def sum_one(weight):
+        w= weight
+        return np.sum(weight)-1
+
+    n_assets           = log_return.shape[1]
+    weight_constraints = ({'type':'eq','fun': sum_one})
+    w0                 = np.random.dirichlet(np.full(n_assets,0.05)).tolist()    # w0 is an initila guess
+
+    return minimize(negativeSR,w0,method='SLSQP', bounds  =((0,1),)*n_assets, constraints = weight_constraints)
 log_return = np.log(data / data.shift(1))
 sharpe_maximum      = max_sharpe_ratio()
 return_p,vol_p      = portfolio_performance(sharpe_maximum['x'])
@@ -99,17 +110,6 @@ def negativeSR(weight):
     rf_rate         = 0.025
     return -(return_p - rf_rate)/vol_p
 
-def max_sharpe_ratio():
-
-    def sum_one(weight):
-        w= weight
-        return np.sum(weight)-1
-
-    n_assets           = log_return.shape[1]
-    weight_constraints = ({'type':'eq','fun': sum_one})
-    w0                 = np.random.dirichlet(np.full(n_assets,0.05)).tolist()    # w0 is an initila guess
-
-    return minimize(negativeSR,w0,method='SLSQP', bounds  =((0,1),)*n_assets, constraints = weight_constraints)
 
 def min_vol():
 
