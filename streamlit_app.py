@@ -125,7 +125,20 @@ if st.button("Train the Model"):
     st.pyplot(plt)
 
 if st.button('Simulation'):
-    
+    log_return = np.log(data / data.shift(1))
+    sharpe_maximum      = max_sharpe_ratio()
+    return_p,vol_p      = portfolio_performance(sharpe_maximum['x'])
+    min_volatility      = min_vol()
+    return_min,vol_min  = portfolio_performance(min_volatility['x'])
+    portfolio        = 2673  # generation of a portfolio
+    n_assets         = log_return.shape[1]
+    weights          = np.random.dirichlet(np.full(n_assets,0.05),portfolio)
+    mean_returns     = log_return.mean()
+    sigma            = log_return.cov()
+    expected_returns = np.zeros(portfolio)
+    expected_vol     = np.zeros(portfolio)
+    sharpe_ratio     = np.zeros(portfolio)
+    rf_rate          = 0.0 
     for i in range(portfolio):
         w  = weights[i,:]
         expected_returns[i] = np.sum(mean_returns @ w)*252
