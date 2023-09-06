@@ -4,8 +4,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 import yfinance as yf
 from scipy.optimize import minimize
-import functions
-from functions import max_sharpe_ratio
 st.title("Portfolio Management Optimization")
 
 # Upload a CSV file from your local computer
@@ -29,6 +27,24 @@ if uploaded_file is not None:
 
         # Portfolio Optimization
         st.header("Portfolio Optimization")
+log_return = np.log(data / data.shift(1))
+
+    
+def expected_sharpe(weights, *args):
+    # get the asset's returns
+    returns = args[0]
+    return - portfolio_return(weights, returns) / portfolio_volatility(weights, returns)
+
+def taget_fun(weights, *args):
+    # get the asset's returns
+    returns = args[0]
+    return portfolio_volatility(weights, returns)
+def portfolio_volatility(weight):
+    return np.sqrt(np.dot(weight.T, np.dot(sigma,weight)))*np.sqrt(252)
+
+def portfolio_return(weight):
+    return np.sum(mean_returns*weight)*252
+
 
 
 
@@ -127,11 +143,8 @@ if st.button("Train the Model"):
     st.pyplot(plt)
 
 if st.button('Simulation'):
-    log_return = np.log(data / data.shift(1))
-    sharpe_maximum      = max_sharpe_ratio()
-    return_p,vol_p      = portfolio_performance(sharpe_maximum['x'])
-    min_volatility      = min_vol()
-    return_min,vol_min  = portfolio_performance(min_volatility['x'])
+    
+    # Portfolio Simulation
     portfolio        = 2673  # generation of a portfolio
     n_assets         = log_return.shape[1]
     weights          = np.random.dirichlet(np.full(n_assets,0.05),portfolio)
@@ -140,61 +153,92 @@ if st.button('Simulation'):
     expected_returns = np.zeros(portfolio)
     expected_vol     = np.zeros(portfolio)
     sharpe_ratio     = np.zeros(portfolio)
-    rf_rate          = 0.0 
+    rf_rate          = 0.0                          # risk free rate
+
     for i in range(portfolio):
         w  = weights[i,:]
         expected_returns[i] = np.sum(mean_returns @ w)*252
         expected_vol[i]  = np.sqrt(np.dot(w.T,sigma @ w))*np.sqrt(252)
         sharpe_ratio[i] = (expected_returns[i]-rf_rate)/expected_vol[i]
 
-    
-    plt.figure(figsize =(15,10))
-    plt.style.use('ggplot')
-    plt.scatter(expected_vol,expected_returns, c = sharpe_ratio)
-    # plt.colorbar.sel(label = 'Sharpe Ratio',size=20)
-    plt.colorbar().set_label('Sharpe Ratio', size= 20, color = 'g', family='serif',weight='bold')
-    target               = np.linspace(return_min,1.02,100)
-    efficient_portfolios = efficient_frontier(target)
-    plt.plot([i.fun for i in efficient_portfolios], target, linestyle ='dashdot', color ='black', label='Efficient Frontier')
-    plt.scatter(vol_p,return_p, c = 'r', marker='*', s = 500, label = 'Maximum Sharpe Ratio')
-    plt.scatter(vol_min,return_min, c = 'g',  marker ='*', s = 500, label='Minimum Volatility Portfolio')
-    font1 = {'family':'serif','color':'darkred','size':20,'weight':'bold'}
-    font2 = {'family':'serif','color':'darkred','size':20,'weight':'bold'}
-    plt.title('Portfolio Optimization based on Efficient Frontier',fontdict=font1)
-    plt.xlabel('Annualised Volatility',fontdict=font2)
-    plt.ylabel('Annualised Returns',fontdict=font2)
-    plt.legend(labelspacing=0.8)
-    st.pyplot(plt)
-    tickers = []
-    for i in data[['AMAZON','MICROSOFT','FDX','Netflix']].columns:
-        tickers.append(i)
-    mean_returns = data[['AMAZON','MICROSOFT','FDX','Netflix']].pct_change().mean()
-    cov = data[['AMAZON','MICROSOFT','FDX','Netflix']].pct_change().cov()
-    num_portfolios = 10000
-    rf = 0.025
-    results_frame =simulate_random_portfolios(num_portfolios, mean_returns,cov, rf)
-    results_frame.sum(axis=1)-results_frame["ret"]-results_frame["stdev"]-results_frame["sharpe"];
+   def portfolio_return(weights, returns):
+        return np.sum(np.mean(returns, axis=1) * weights) * 252
+
+   def portfolio_volatility(weights, returns):
+       return np.sqrt(np.dot(weights.T, np.dot(np.cov(returns) * 252, weights)))
+
+   def portfolio_performance(weight):
+       return_p = portfolio_return(weight)
+       vol_p    = portfolio_volatility(weight)
+       return return_p, vol_p
+   def negativeSR(weight):
+       return_p, vol_p = portfolio_performance(weight)
+       rf_rate         = 0.025
+       return -(return_p - rf_rate)/vol_p
+
+    def max_sharpe_ratio():
+        def sum_one(weight):
+            w= weight
+            return np.sum(weight)-1
+
+         n_assets           = log_return.shape[1]
+         weight_constraints = ({'type':'eq','fun': sum_one})
+         w0                 = np.random.dirichlet(np.full(n_assets,0.05)).tolist()    # w0 is an initila guess
+
+         return minimize(negativeSR,w0,method='SLSQP',
+                          bounds  =((0,1),)*n_assets,
+                      constraints = weight_constraints)
+     def min_vol():
+         n_assets           = log_return.shape[1]
+         weight_constraints = ({'type':'eq','fun': lambda x: np.sum(x)-1})
+         w0                 = np.random.dirichlet(np.full(n_assets,0.05)).tolist()
+         bounds             = ((0,1),)*n_assets
+
+         return minimize(portfolio_volatility,w0,method='SLSQP',
+                   bounds      = bounds,
+                   constraints = weight_constraints)
+
+     def efficient_portfolio_target(target):
+         constraints = ({'type':'eq','fun': lambda x: portfolio_return(x)- target},
+                  {'type' :'eq','fun': lambda x: np.sum(x)-1})
+         w0          = np.random.dirichlet(np.full(n_assets,0.05)).tolist()
+         bounds      = ((0,1),)*n_assets
+
+         return minimize(portfolio_volatility,w0, method = 'SLSQP', bounds      = bounds, constraints = constraints)
+
+      def efficient_frontier(return_range):
+          
+          return [efficient_portfolio_target(ret) for ret in return_range]
+
+      sharpe_maximum      = max_sharpe_ratio()
+      return_p,vol_p      = portfolio_performance(sharpe_maximum['x'])
+      min_volatility      = min_vol()
+      return_min,vol_min  = portfolio_performance(min_volatility['x'])
+
+
+      plt.figure(figsize =(15,10))
+      plt.style.use('ggplot')
+      plt.scatter(expected_vol,expected_returns, c = sharpe_ratio)
+      # plt.colorbar.sel(label = 'Sharpe Ratio',size=20)
+      plt.colorbar().set_label('Sharpe Ratio', size= 20, color = 'g', family='serif',weight='bold')
+      target               = np.linspace(return_min,1.02,100)
+      efficient_portfolios = efficient_frontier(target)
+      plt.plot([i.fun for i in efficient_portfolios], target, linestyle ='dashdot', color ='black',
+         label='Efficient Frontier')
+      plt.scatter(vol_p,return_p, c = 'r', marker='*', s = 500, label = 'Maximum Sharpe Ratio')
+      plt.scatter(vol_min,return_min, c = 'g',  marker ='*', s = 500, label='Minimum Volatility Portfolio')
+
+      font1 = {'family':'serif','color':'darkred','size':20,'weight':'bold'}
+      font2 = {'family':'serif','color':'darkred','size':20,'weight':'bold'}
+      plt.title('Portfolio Optimization based on Efficient Frontier',fontdict=font1)
+      plt.xlabel('Annualised Volatility',fontdict=font2)
+      plt.ylabel('Annualised Returns',fontdict=font2)
+      plt.legend(labelspacing=0.8)
+      st.pyplot(plt)
+
   
-    max_sharpe_port=results_frame.iloc[results_frame["sharpe"].idxmax()] # max sharp ratio rouge
     
-    min_vol_port = results_frame.iloc[results_frame["stdev"].idxmin()] # min volatility = min variance portfolio vert
-   
-    plt.subplots(figsize=(15,10)) # Number of rows/colums of the subplot grid
-    plt.scatter(results_frame.stdev,results_frame.ret,c=results_frame.sharpe,cmap='plasma') #Colormaps in Matplotlib
-    font1 = {'family':'serif','color':'darkred','size':20,'weight':'bold'}
-    font2 = {'family':'serif','color':'darkred','size':20,'weight':'bold'}
-    plt.title('Optimization of the portfolio',fontdict=font1)
-    plt.xlabel('Risk/Annualised Volatility',fontdict=font2)
-    plt.ylabel('Annualised Returns',fontdict=font2)
     
-    plt.colorbar().set_label('Sharpe Ratio', size= 20, color = 'g', family='serif',weight='bold')
-    target  = np.linspace(return_min,1.02,100)
-    
-    plt.scatter(max_sharpe_port[1],max_sharpe_port[0],marker=(5,1,0),color='r',s=500, label = 'Maximum Sharpe Ratio')
-    
-    plt.scatter(min_vol_port[1] ,min_vol_port[0],marker=(5,1,0),color='g', s=500, label='Minimum Volatility Portfolio')
-    plt.legend(labelspacing=0.8)
-    st.pyplot(plt)
 
 
     
