@@ -39,11 +39,8 @@ def taget_fun(weights, *args):
     # get the asset's returns
     returns = args[0]
     return portfolio_volatility(weights, returns)
-def portfolio_volatility(weight):
-    return np.sqrt(np.dot(weight.T, np.dot(sigma,weight)))*np.sqrt(252)
 
-def portfolio_return(weight):
-    return np.sum(mean_returns*weight)*252
+
 
 if st.button("Daily Returns of the Portfolio"):
     if uploaded_file is None:
@@ -156,6 +153,12 @@ if st.button("Train the Model"):
         expected_returns[i] = np.sum(mean_returns @ w)*252
         expected_vol[i]  = np.sqrt(np.dot(w.T,sigma @ w))*np.sqrt(252)
         sharpe_ratio[i] = (expected_returns[i]-rf_rate)/expected_vol[i]
+
+   def portfolio_volatility(weight):
+       return np.sqrt(np.dot(weight.T, np.dot(sigma,weight)))*np.sqrt(252)
+
+   def portfolio_return(weight):
+       return np.sum(mean_returns*weight)*252
 
    def portfolio_return(weights, returns):
         return np.sum(np.mean(returns, axis=1) * weights) * 252
