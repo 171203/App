@@ -42,8 +42,8 @@ def taget_fun(weights, *args):
 def portfolio_volatility(weight):
     return np.sqrt(np.dot(weight.T, np.dot(sigma,weight)))*np.sqrt(252)
 
-def portfolio_return(weight):
-    return np.sum(mean_returns*weight)*252
+ def portfolio_return(weight):
+     return np.sum(mean_returns*weight)*252
 
 
 
