@@ -4,6 +4,29 @@ import numpy as np
 import matplotlib.pyplot as plt
 import yfinance as yf
 from scipy.optimize import minimize
+st.title("Portfolio Management Optimization")
+
+# Upload a CSV file from your local computer
+uploaded_file = st.file_uploader("Upload a CSV file", type=["csv"])
+
+# Define the expected column names
+expected_columns = ["AMAZON", "MICROSOFT", "FDX", "Netflix"]
+
+if uploaded_file is not None:
+    # Load the CSV file into a DataFrame
+    data = pd.read_csv(uploaded_file)
+
+    # Check if the DataFrame contains the expected columns
+    if not set(expected_columns).issubset(data.columns):
+        st.error("Warning: The given dataset is not suitable for the Optimization")
+        st.error("Error: Please upload the daatset named My_Portfolio.")
+    else:
+        # Display the uploaded data
+        st.write("Uploaded CSV Data:")
+        st.dataframe(data)
+
+        # Portfolio Optimization
+        st.header("Portfolio Optimization")
 log_return = np.log(data / data.shift(1))
 sharpe_maximum      = max_sharpe_ratio()
 return_p,vol_p      = portfolio_performance(sharpe_maximum['x'])
@@ -113,29 +136,7 @@ def efficient_portfolio_target(target):
 def efficient_frontier(return_range):
     return [efficient_portfolio_target(ret) for ret in return_range]
 
-st.title("Portfolio Optimization using Markowitz Model")
 
-# Upload a CSV file from your local computer
-uploaded_file = st.file_uploader("Upload a CSV file", type=["csv"])
-
-# Define the expected column names
-expected_columns = ["AMAZON", "MICROSOFT", "FDX", "Netflix"]
-
-if uploaded_file is not None:
-    # Load the CSV file into a DataFrame
-    data = pd.read_csv(uploaded_file)
-
-    # Check if the DataFrame contains the expected columns
-    if not set(expected_columns).issubset(data.columns):
-        st.error("Warning: The given dataset is not suitable for the Optimization")
-        st.error("Error: Please upload the daatset named My_Portfolio.")
-    else:
-        # Display the uploaded data
-        st.write("Uploaded CSV Data:")
-        st.dataframe(data)
-
-        # Portfolio Optimization
-        st.header("Portfolio Optimization")
 
 
 # Main content
