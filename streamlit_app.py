@@ -101,42 +101,42 @@ if uploaded_file is not None:
 
 
     
- if st.button("Train the Model"):
-     log_return = np.log(data / data.shift(1))
-     num_ports = 5000
-     all_weights = np.zeros((num_ports, len(data.columns)))
-     ret_arr = np.zeros(num_ports)
-     vol_arr = np.zeros(num_ports)
-     sharpe_arr = np.zeros(num_ports)
+  if st.button("Train the Model"):
+      log_return = np.log(data / data.shift(1))
+      num_ports = 5000
+      all_weights = np.zeros((num_ports, len(data.columns)))
+      ret_arr = np.zeros(num_ports)
+      vol_arr = np.zeros(num_ports)
+      sharpe_arr = np.zeros(num_ports)
 
-     for ind in range(num_ports):
-         weights = np.array(np.random.random(4))
-         weights = weights/np.sum(weights)
+      for ind in range(num_ports):
+          weights = np.array(np.random.random(4))
+          weights = weights/np.sum(weights)
 
-         # save the weights
-         all_weights[ind,:] = weights
+          # save the weights
+          all_weights[ind,:] = weights
 
-         # expected return
-         ret_arr[ind] = np.sum((log_return.mean()*weights)*252)
+          # expected return
+          ret_arr[ind] = np.sum((log_return.mean()*weights)*252)
 
-         # expected volatility
-         vol_arr[ind] = np.sqrt(np.dot(weights.T,np.dot(log_return.cov()*252, weights)))
+          # expected volatility
+          vol_arr[ind] = np.sqrt(np.dot(weights.T,np.dot(log_return.cov()*252, weights)))
 
-         # Sharpe Ratio
-         sharpe_arr[ind] = ret_arr[ind]/vol_arr[ind]
+          # Sharpe Ratio
+          sharpe_arr[ind] = ret_arr[ind]/vol_arr[ind]
 
-     max_sr_ret = ret_arr[4632]
-     max_sr_vol = vol_arr[4632]
-     # plot the dataplt.figure(figsize=(12,8))
-     plt.scatter(vol_arr,ret_arr,c=sharpe_arr,cmap='plasma')
-     plt.colorbar(label='Sharpe Ratio')
-     plt.title("Visualization of the Portfolio")
-     plt.xlabel('Volatility')
-     plt.ylabel('Return')
+      max_sr_ret = ret_arr[4632]
+      max_sr_vol = vol_arr[4632]
+      # plot the dataplt.figure(figsize=(12,8))
+      plt.scatter(vol_arr,ret_arr,c=sharpe_arr,cmap='plasma')
+      plt.colorbar(label='Sharpe Ratio')
+      plt.title("Visualization of the Portfolio")
+      plt.xlabel('Volatility')
+      plt.ylabel('Return')
 
-     # add a red dot for max_sr_vol & max_sr_ret
-     plt.scatter(max_sr_vol, max_sr_ret, c='red', s=50, edgecolors='black')
-     st.pyplot(plt)
+      # add a red dot for max_sr_vol & max_sr_ret
+      plt.scatter(max_sr_vol, max_sr_ret, c='red', s=50, edgecolors='black')
+      st.pyplot(plt)
 
  if st.button('Simulation'):
     
