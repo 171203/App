@@ -4,7 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import yfinance as yf
 from scipy.optimize import minimize
-from main import max_sharpe_ratio
+import functions
 st.title("Portfolio Management Optimization")
 
 # Upload a CSV file from your local computer
