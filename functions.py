@@ -1,3 +1,4 @@
+log_return = np.log(data / data.shift(1))
 def max_sharpe_ratio():
 
     def sum_one(weight):
