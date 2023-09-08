@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 import yfinance as yf
 import scipy.optimize as sco
 import requests
+import io
 
 def fetch_data_file(url):
     response = requests.get(url)
