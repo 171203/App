@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from scipy.optimize import minimize
 import yfinance as yf
-from datetime import datetime
+from datetime import datetime 
 
 # Fetch historical stock data
 def fetch_stock_data(symbol, start_date, end_date):
