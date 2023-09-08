@@ -1,112 +1,98 @@
 import streamlit as st
-import yfinance as yf
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-from scipy.optimize import minimize
+import seaborn as sns
+import yfinance as yf
+import scipy.optimize as sco
 
-# Define a function to download and process stock data
-def download_stock_data(ticker, start_date, end_date):
-    stock_data = yf.download(ticker, start=start_date, end=end_date)
-    return stock_data
+# Download financial data
+@st.cache
+def download_data():
+    AMZN = yf.download("AMZN", start="2012-05-18", end="2023-01-01", group_by="ticker")
+    MSFT = yf.download("MSFT", start="2012-05-18", end="2023-01-01", group_by="ticker")
+    NFLX = yf.download("NFLX", start="2012-05-18", end="2023-01-01", group_by="ticker")
+    FDX = yf.download("FDX", start="2012-05-18", end="2023-01-01", group_by="ticker")
+    return AMZN, MSFT, NFLX, FDX
 
-# Define a function to calculate portfolio performance
-def portfolio_performance(weights, returns):
-    mean_returns = returns.mean()
-    portfolio_return = np.sum(mean_returns * weights) * 252
-    portfolio_volatility = np.sqrt(np.dot(weights.T, np.dot(returns.cov() * 252, weights)))
-    return portfolio_return, portfolio_volatility
+AMZN, MSFT, NFLX, FDX = download_data()
+st.write("Data Downloaded:", AMZN.shape, MSFT.shape, NFLX.shape, FDX.shape)
 
-# Define the Streamlit app
-def main():
-    st.title('Portfolio Optimization App')
+# Create a combined dataset
+dataset = pd.concat([AMZN['Adj Close'], MSFT['Adj Close'], FDX['Adj Close'], NFLX['Adj Close']], axis=1)
+dataset.columns = ['AMAZON', 'MICROSOFT', 'FDX', 'Netflix']
 
-    # Sidebar
-    st.sidebar.header('Portfolio Configuration')
-    selected_stocks = st.sidebar.multiselect('Select Stocks', ['AMZN', 'MSFT', 'NFLX', 'FDX'], default=['AMZN', 'MSFT'])
-    start_date = st.sidebar.date_input('Start Date', pd.to_datetime('2012-05-18'))
-    end_date = st.sidebar.date_input('End Date', pd.to_datetime('2023-01-01'))
+# Sidebar with user input
+st.sidebar.title("Portfolio Optimization")
+st.sidebar.markdown("Adjust the portfolio weights and target return:")
 
-    # Download stock data
-    stock_data = download_stock_data(selected_stocks, start_date, end_date)
-
-    # Display stock data
-    st.subheader('Stock Data')
-    st.write(stock_data.tail())
-
-    # Calculate and display portfolio statistics
-    log_returns = np.log(stock_data['Adj Close'] / stock_data['Adj Close'].shift(1))
-    num_assets = len(selected_stocks)
-
-    st.subheader('Portfolio Statistics')
-    st.write(f'Number of Selected Stocks: {num_assets}')
-
-    st.subheader('Expected Returns and Volatility')
-    st.write('Annualized Expected Returns and Volatility:')
-    
-    def calculate_portfolio_statistics(weights):
-        portfolio_return, portfolio_volatility = portfolio_performance(weights, log_returns)
-        return portfolio_return, portfolio_volatility
-
-    # Define an optimization function to maximize the Sharpe ratio
-    def negative_sharpe(weights):
-        portfolio_return, portfolio_volatility = calculate_portfolio_statistics(weights)
-        rf_rate = 0.0  # Risk-free rate (you can adjust this)
-        return -(portfolio_return - rf_rate) / portfolio_volatility
-
-    # Constraints
-    constraints = ({'type': 'eq', 'fun': lambda weights: np.sum(weights) - 1})
-
-    # Initial weights (equal weights)
-    initial_weights = [1.0 / num_assets] * num_assets
-
-    # Optimize portfolio
-    result = minimize(negative_sharpe, initial_weights, method='SLSQP', bounds=[(0, 1)] * num_assets, constraints=constraints)
-    optimized_weights = result.x
-
-    # Display portfolio statistics
-    optimized_return, optimized_volatility = calculate_portfolio_statistics(optimized_weights)
-    st.write(f'Optimal Portfolio Weights: {optimized_weights}')
-    st.write(f'Expected Return: {optimized_return:.2%}')
-    st.write(f'Volatility: {optimized_volatility:.2%}')
-
-    # Efficient Frontier
-    st.subheader('Efficient Frontier')
-    num_portfolios = 10000
-    all_weights = np.zeros((num_portfolios, num_assets))
-    ret_arr = np.zeros(num_portfolios)
-    vol_arr = np.zeros(num_portfolios)
+# Define portfolio optimization function
+def portfolio_optimization(returns, num_portfolios, risk_free_rate, target_return):
+    num_assets = len(returns.columns)
+    results = np.zeros((4, num_portfolios))
 
     for i in range(num_portfolios):
         weights = np.random.random(num_assets)
         weights /= np.sum(weights)
-        all_weights[i, :] = weights
-        ret, vol = calculate_portfolio_statistics(weights)
-        ret_arr[i] = ret
-        vol_arr[i] = vol
 
-    # Calculate the Sharpe ratio for each portfolio
-    sharpe_ratio = ret_arr / vol_arr
+        # Expected return
+        portfolio_return = np.sum(returns.mean() * weights) * 252
 
-    # Find the portfolio with the highest Sharpe ratio
-    max_sharpe_idx = sharpe_ratio.argmax()
-    max_sharpe_return = ret_arr[max_sharpe_idx]
-    max_sharpe_volatility = vol_arr[max_sharpe_idx]
+        # Expected volatility
+        portfolio_volatility = np.sqrt(np.dot(weights.T, np.dot(returns.cov() * 252, weights)))
 
-    # Plot the efficient frontier
-    plt.figure(figsize=(12, 6))
-    plt.scatter(vol_arr, ret_arr, c=sharpe_ratio, cmap='viridis')
-    plt.colorbar(label='Sharpe Ratio')
-    plt.title('Efficient Frontier')
-    plt.xlabel('Volatility')
-    plt.ylabel('Return')
+        # Sharpe ratio
+        sharpe_ratio = (portfolio_return - risk_free_rate) / portfolio_volatility
 
-    # Highlight the portfolio with the highest Sharpe ratio
-    plt.scatter(max_sharpe_volatility, max_sharpe_return, c='red', marker='*', s=100, label='Max Sharpe Ratio')
-    plt.legend()
-    st.pyplot(plt)
+        results[0, i] = portfolio_return
+        results[1, i] = portfolio_volatility
+        results[2, i] = sharpe_ratio
+        results[3, i] = weights[0]  # Weight of Amazon
 
-if __name__ == '__main__':
-    main()
+    return results
+
+# Sidebar inputs
+num_portfolios = st.sidebar.slider("Number of Portfolios", 1, 10000, 1000)
+risk_free_rate = st.sidebar.slider("Risk-Free Rate (%)", 0.0, 10.0, 2.5)
+target_return = st.sidebar.slider("Target Return (%)", 0.0, 20.0, 10.0)
+
+# Calculate portfolio optimization results
+returns = np.log(dataset / dataset.shift(1))
+results = portfolio_optimization(returns, num_portfolios, risk_free_rate / 100, target_return / 100)
+
+# Display portfolio optimization results
+st.title("Portfolio Optimization Results")
+st.markdown(f"**Number of Portfolios:** {num_portfolios}")
+st.markdown(f"**Risk-Free Rate:** {risk_free_rate}%")
+st.markdown(f"**Target Return:** {target_return}%")
+
+# Create a DataFrame to display the results
+columns = ["Return", "Volatility", "Sharpe Ratio", "Weight of Amazon"]
+df_results = pd.DataFrame(results.T, columns=columns)
+
+# Find the portfolio with the maximum Sharpe ratio
+max_sharpe_idx = df_results["Sharpe Ratio"].idxmax()
+max_sharpe_portfolio = df_results.iloc[max_sharpe_idx]
+
+st.subheader("Maximum Sharpe Ratio Portfolio")
+st.write(df_results)
+st.write(f"Maximum Sharpe Ratio Portfolio:\n{max_sharpe_portfolio}")
+
+# Plotting the efficient frontier
+st.subheader("Efficient Frontier")
+plt.figure(figsize=(10, 6))
+plt.scatter(df_results["Volatility"], df_results["Return"], c=df_results["Sharpe Ratio"], cmap="viridis")
+plt.title("Efficient Frontier")
+plt.xlabel("Volatility")
+plt.ylabel("Return")
+plt.colorbar(label="Sharpe Ratio")
+st.pyplot(plt)
+
+# Display the weights of the maximum Sharpe ratio portfolio
+st.subheader("Maximum Sharpe Ratio Portfolio Weights")
+st.write("Weights of Assets in Maximum Sharpe Ratio Portfolio:")
+st.write("Amazon:", max_sharpe_portfolio["Weight of Amazon"])
+st.write("Microsoft:", 1 - max_sharpe_portfolio["Weight of Amazon"])
+
 
 
