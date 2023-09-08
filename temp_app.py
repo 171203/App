@@ -1,83 +1,113 @@
 import streamlit as st
+import yfinance as yf
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-from datetime import datetime
-import yfinance as yf
-import scipy.optimize as sco
+import seaborn as sns
+from scipy.optimize import minimize
 
-# Download stock data
-AMZN = yf.download("AMZN", start="2012-05-18", end="2023-01-01", group_by="ticker") # Stock of Amazon
-MSFT = yf.download("MSFT", start="2012-05-18", end="2023-01-01", group_by="ticker") # Stock of Microsoft
-NFLX = yf.download("NFLX", start="2012-05-18", end="2023-01-01", group_by="ticker")
-FDX = yf.download("FDX", start="2012-05-18", end="2023-01-01", group_by="ticker")
+# Define a function to download and process stock data
+def download_stock_data(ticker, start_date, end_date):
+    stock_data = yf.download(ticker, start=start_date, end=end_date)
+    return stock_data
 
-# Combine stock data into a single DataFrame
-AMZN_AJClose = AMZN['Adj Close']
-MSFT_AJClose = MSFT['Adj Close']
-FDX_AJClose = FDX['Adj Close']
-NFLX_AJClose = NFLX['Adj Close']
-dataset = pd.concat([AMZN_AJClose, MSFT_AJClose, FDX_AJClose, NFLX_AJClose], axis=1)
-dataset['Date'] = pd.to_datetime(dataset['Date'])  # Convert the column to DateTime type
-dataset.set_index('Date', inplace=True)  # Set 'Date' column as the index
-dataset.index = dataset.index.tz_localize('US/Eastern')
-dataset.columns = ['AMAZON', 'MICROSOFT', 'FDX', 'Netflix']
+# Define a function to calculate portfolio performance
+def portfolio_performance(weights, returns):
+    mean_returns = returns.mean()
+    portfolio_return = np.sum(mean_returns * weights) * 252
+    portfolio_volatility = np.sqrt(np.dot(weights.T, np.dot(returns.cov() * 252, weights)))
+    return portfolio_return, portfolio_volatility
 
-# Define Streamlit app
+# Define the Streamlit app
 def main():
-    st.title("Portfolio Optimization App")
+    st.title('Portfolio Optimization App')
 
-    # Display boxplot
-    st.subheader("Boxplot of Stock Prices")
-    st.pyplot(plot_boxplot(dataset))
+    # Sidebar
+    st.sidebar.header('Portfolio Configuration')
+    selected_stocks = st.sidebar.multiselect('Select Stocks', ['AMZN', 'MSFT', 'NFLX', 'FDX'], default=['AMZN', 'MSFT'])
+    start_date = st.sidebar.date_input('Start Date', pd.to_datetime('2012-05-18'))
+    end_date = st.sidebar.date_input('End Date', pd.to_datetime('2023-01-01'))
 
-    # Display scatter matrix
-    st.subheader("Scatter Matrix of Stock Prices")
-    st.pyplot(plot_scatter_matrix(dataset))
+    # Download stock data
+    stock_data = download_stock_data(selected_stocks, start_date, end_date)
 
-    # Display daily close prices
-    st.subheader("Daily Close Prices")
-    st.pyplot(plot_daily_close_prices(dataset))
+    # Display stock data
+    st.subheader('Stock Data')
+    st.write(stock_data.tail())
 
-    # Display correlation heatmap
-    st.subheader("Correlation Heatmap")
-    st.pyplot(plot_correlation_heatmap(dataset))
+    # Calculate and display portfolio statistics
+    log_returns = np.log(stock_data['Adj Close'] / stock_data['Adj Close'].shift(1))
+    num_assets = len(selected_stocks)
 
-    # Portfolio optimization
-    st.subheader("Portfolio Optimization Results")
-    st.write("Portfolio performance metrics and optimization results go here.")
+    st.subheader('Portfolio Statistics')
+    st.write(f'Number of Selected Stocks: {num_assets}')
 
-# Define functions for creating plots
-def plot_boxplot(data):
-    plt.figure(figsize=(8, 6))
-    data.boxplot()
-    plt.title("Boxplot of Stock Prices")
-    return plt
+    st.subheader('Expected Returns and Volatility')
+    st.write('Annualized Expected Returns and Volatility:')
+    
+    def calculate_portfolio_statistics(weights):
+        portfolio_return, portfolio_volatility = portfolio_performance(weights, log_returns)
+        return portfolio_return, portfolio_volatility
 
-def plot_scatter_matrix(data):
-    plt.figure(figsize=(10, 8))
-    pd.plotting.scatter_matrix(data, figsize=(10, 10))
-    plt.title("Scatter Matrix of Stock Prices")
-    return plt
+    # Define an optimization function to maximize the Sharpe ratio
+    def negative_sharpe(weights):
+        portfolio_return, portfolio_volatility = calculate_portfolio_statistics(weights)
+        rf_rate = 0.0  # Risk-free rate (you can adjust this)
+        return -(portfolio_return - rf_rate) / portfolio_volatility
 
-def plot_daily_close_prices(data):
+    # Constraints
+    constraints = ({'type': 'eq', 'fun': lambda weights: np.sum(weights) - 1})
+
+    # Initial weights (equal weights)
+    initial_weights = [1.0 / num_assets] * num_assets
+
+    # Optimize portfolio
+    result = minimize(negative_sharpe, initial_weights, method='SLSQP', bounds=[(0, 1)] * num_assets, constraints=constraints)
+    optimized_weights = result.x
+
+    # Display portfolio statistics
+    optimized_return, optimized_volatility = calculate_portfolio_statistics(optimized_weights)
+    st.write(f'Optimal Portfolio Weights: {optimized_weights}')
+    st.write(f'Expected Return: {optimized_return:.2%}')
+    st.write(f'Volatility: {optimized_volatility:.2%}')
+
+    # Efficient Frontier
+    st.subheader('Efficient Frontier')
+    num_portfolios = 10000
+    all_weights = np.zeros((num_portfolios, num_assets))
+    ret_arr = np.zeros(num_portfolios)
+    vol_arr = np.zeros(num_portfolios)
+
+    for i in range(num_portfolios):
+        weights = np.random.random(num_assets)
+        weights /= np.sum(weights)
+        all_weights[i, :] = weights
+        ret, vol = calculate_portfolio_statistics(weights)
+        ret_arr[i] = ret
+        vol_arr[i] = vol
+
+    # Calculate the Sharpe ratio for each portfolio
+    sharpe_ratio = ret_arr / vol_arr
+
+    # Find the portfolio with the highest Sharpe ratio
+    max_sharpe_idx = sharpe_ratio.argmax()
+    max_sharpe_return = ret_arr[max_sharpe_idx]
+    max_sharpe_volatility = vol_arr[max_sharpe_idx]
+
+    # Plot the efficient frontier
     plt.figure(figsize=(12, 6))
-    plt.grid(True)
-    plt.title('Daily Close Prices')
-    plt.xlabel('Date: May 18th, 2012 - Dec. 30th, 2022')
-    plt.ylabel('Values')
-    for col in data.columns:
-        plt.plot(data.index, data[col], label=col)
+    plt.scatter(vol_arr, ret_arr, c=sharpe_ratio, cmap='viridis')
+    plt.colorbar(label='Sharpe Ratio')
+    plt.title('Efficient Frontier')
+    plt.xlabel('Volatility')
+    plt.ylabel('Return')
+
+    # Highlight the portfolio with the highest Sharpe ratio
+    plt.scatter(max_sharpe_volatility, max_sharpe_return, c='red', marker='*', s=100, label='Max Sharpe Ratio')
     plt.legend()
-    return plt
+    st.pyplot(plt)
 
-def plot_correlation_heatmap(data):
-    plt.figure(figsize=(10, 6))
-    corr = data.corr()
-    sns.heatmap(corr, xticklabels=corr.columns.values, yticklabels=corr.columns.values, annot=True, annot_kws={'size': 12})
-    plt.title("Correlation Heatmap")
-    return plt
-
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()
+
 
