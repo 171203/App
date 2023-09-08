@@ -4,22 +4,27 @@ import numpy as np
 import matplotlib.pyplot as plt
 import yfinance as yf
 import scipy.optimize as sco
+import requests
 
-# Download financial data
-@st.cache
-def download_data():
-    AMZN = yf.download("AMZN", start="2012-05-18", end="2023-01-01", group_by="ticker")
-    MSFT = yf.download("MSFT", start="2012-05-18", end="2023-01-01", group_by="ticker")
-    NFLX = yf.download("NFLX", start="2012-05-18", end="2023-01-01", group_by="ticker")
-    FDX = yf.download("FDX", start="2012-05-18", end="2023-01-01", group_by="ticker")
-    return AMZN, MSFT, NFLX, FDX
+def fetch_data_file(url):
+    response = requests.get(url)
+    if response.status_code == 200:
+        return response.text
+    else:
+        st.error("Failed to fetch data file from GitHub.")
+        return None
 
-AMZN, MSFT, NFLX, FDX = download_data()
-st.write("Data Downloaded:", AMZN.shape, MSFT.shape, NFLX.shape, FDX.shape)
+github_url = f"https://github.com/171203/App/blob/main/data.csv"
+if st.button("Fetch Data from GitHub"):
+    data_text = fetch_data_file(github_url)
 
-# Create a combined dataset
-dataset = pd.concat([AMZN['Adj Close'], MSFT['Adj Close'], FDX['Adj Close'], NFLX['Adj Close']], axis=1)
-dataset.columns = ['AMAZON', 'MICROSOFT', 'FDX', 'Netflix']
+    if data_text:
+        # Load the data into a DataFrame (modify this part according to your data format)
+        df = pd.read_csv(io.StringIO(data_text))
+
+        # Display the data in your Streamlit app
+        st.write("Data fetched from GitHub:")
+        st.write(df)
 
 # Sidebar with user input
 st.sidebar.title("Portfolio Optimization")
