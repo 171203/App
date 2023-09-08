@@ -61,7 +61,7 @@ risk_free_rate = st.sidebar.slider("Risk-Free Rate (%)", 0.0, 10.0, 2.5)
 target_return = st.sidebar.slider("Target Return (%)", 0.0, 20.0, 10.0)
 
 # Calculate portfolio optimization results
-returns = np.log(dataset / dataset.shift(1))
+returns = np.log(df / df.shift(1))
 results = portfolio_optimization(returns, num_portfolios, risk_free_rate / 100, target_return / 100)
 
 # Display portfolio optimization results
