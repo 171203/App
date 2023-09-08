@@ -4,3 +4,4 @@ streamlit==1.8.0
 matplotlib==3.4.3
 yfinance==0.1.64
 scipy==1.7.3
+seaborn==0.11.2
