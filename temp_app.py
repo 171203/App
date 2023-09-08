@@ -18,7 +18,9 @@ MSFT_AJClose = MSFT['Adj Close']
 FDX_AJClose = FDX['Adj Close']
 NFLX_AJClose = NFLX['Adj Close']
 dataset = pd.concat([AMZN_AJClose, MSFT_AJClose, FDX_AJClose, NFLX_AJClose], axis=1)
-dataset['Date'] = dataset['Date'].dt.tz_localize('US/Eastern')
+dataset['Date'] = pd.to_datetime(dataset['Date'])  # Convert the column to DateTime type
+dataset.set_index('Date', inplace=True)  # Set 'Date' column as the index
+dataset.index = dataset.index.tz_localize('US/Eastern')
 dataset.columns = ['AMAZON', 'MICROSOFT', 'FDX', 'Netflix']
 
 # Define Streamlit app
